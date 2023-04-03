@@ -2,7 +2,9 @@ package com.freeloop.principle.segregation.improve;
 
 /**
  * Segregation1
- *
+ * 将接口拆分为独立的几个接口，这里我们拆分为3个，
+ * 类A和类C分别于他们需要的接口建立关系
+ * 也就是采用接口隔离原则
  * @author fj
  * @since 2023/4/3 21:21
  */
