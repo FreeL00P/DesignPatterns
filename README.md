@@ -78,10 +78,174 @@
   在某些情况下可能会导致资源浪费，即如果 INSTANCE 并未被使用到，
   但是它却会在类加载时被创建出来并占用一定的内存空间。
   ```
+  - 静态变量实现
+  
+    ```java
+    public class Singleton {
+      private static Singleton INSTANCE = new Singleton();
+    
+      private Singleton() {}
+      
+      public static Singleton getInstance() {
+          return INSTANCE;
+      }
+    }
+    ```
+  
+  - 静态代码块形式
+  
+    ```java
+    public class Singleton {
+        private static final Singleton INSTANCE;
+    
+        static {
+            INSTANCE = new Singleton();
+        }
+    
+        private Singleton() {}
+    
+        public static Singleton getInstance() {
+            return INSTANCE;
+        }
+    }
+    ```
+  - 枚举式
+  
+    ```java
+    public enum Singleton {
+        INSTANCE;
+    }
+    ```
+
 - 懒汉式
-  ```
-  其核心思想是在需要获取实例时才进行对象的实例化。相比于饿汉式，懒汉式的实现需要注意多线程环境下的线程安全问题。
+
+  ```text
+  其核心思想是在需要获取实例时才进行对象的实例化。相比于饿汉式，懒汉式的实现需要注意多线		程环境下的线程安全问题。
   在懒汉式的实现过程中，可以使用一个私有的静态变量来存储该实例，但是不进行初始化，直到第一次使用该实例时再进行初始化，
   并返回该实例的引用。为了确保多线程环境下的线程安全问题，可以使用 synchronized 关键字或者双重检测锁来实现线程安全的访问。
   ```
 
+  - 线程不安全的懒汉式  
+
+    ```java
+    /*
+    在第一次使用时才进行实例化，但是没有考虑多线程下的并发问题，有可能会导致多个线程在同一时刻创建多个实例。如果并发访问情况下极容易出现线程安全问题，因此不推荐使用。
+    */
+    public class Singleton {
+        private static Singleton instance;
+    	
+        private Singleton() {}
+    
+        public static Singleton getInstance() {
+            if (instance == null) {
+                instance = new Singleton();
+            }
+            return instance;
+        }
+    }
+    ```
+
+  - 线程安全的懒汉式
+
+    ```java
+    /*
+    线程安全的懒汉式指的是，使用双重检查锁（Double-Check Locking，DCL）的方式，即在保证线程安全的前提下，尽量避免不必要的锁竞争和实例化操作。
+    */
+    public class Singleton {
+        private volatile static Singleton instance;
+    
+        private Singleton() {}
+    
+        public static Singleton getInstance() {
+            if (instance == null) {
+                synchronized (Singleton.class) {
+                    if (instance == null) {
+                        instance = new Singleton();
+                    }
+                }
+            }
+            return instance;
+        }
+    }
+    ```
+
+  - 内部类懒汉式
+
+    ```java
+    /*
+    使用内部类的方式实现线程安全的懒汉式单例模式。在内部类中创建单例对象进行初始化，通过静态内部类的特性来保证线程安全和唯一性。
+    */
+    public class Singleton {
+    
+        private Singleton() {}
+    
+        private static class SingletonHolder {
+            private static final Singleton INSTANCE = new Singleton();
+        }
+    
+        public static Singleton getInstance() {
+            return SingletonHolder.INSTANCE;
+        }
+    }
+    
+    ```
+
+    无论使用哪种方式，懒汉式单例模式都是在第一次使用时才进行实例化，避免了在类加载时就创建单例对象所带来的性能问题。但是需要注意，第一种方式并不能保证线程安全，因此不推荐使用。其他两种方式能够保证线程安全且高效，因此推荐使用。
+
+### 简单工厂模式
+
+```java
+/*
+在简单工厂模式中，包含一个工厂类 Factory，该类负责创建对应产品的对象。工厂类中通常会包括一个静态方法，该方法根据不同的参数生成不同的产品实例。这样，客户端只需要知道产品的类型，而不需要关心产品的创建过程。
+*/ 
+public interface Product {
+    void use();
+}
+
+public class ConcreteProduct1 implements Product {
+    @Override
+    public void use() {
+        System.out.println("Product 1 used.");
+    }
+}
+
+public class ConcreteProduct2 implements Product {
+    @Override
+    public void use() {
+        System.out.println("Product 2 used.");
+    }
+}
+
+public class SimpleFactory {
+    public static Product createProduct(int type) {
+        switch (type) {
+            case 1 :
+                return new ConcreteProduct1();
+            case 2 :
+                return new ConcreteProduct2();
+            default :
+                throw new IllegalArgumentException("Invalid product type.");
+        }
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        Product product = SimpleFactory.createProduct(1);
+        product.use();
+    }
+}
+```
+
+
+
+简单工厂模式的主要特点是通过一个工厂方法来创建对象，而不是通过类的构造器。
+
+- 使用简单工厂模式的优点在于：
+  - 客户端代码与产品对象的创建过程分离，降低耦合度。
+  - 在新增产品时，仅需适当修改工厂类即可，无需修改客户端代码，提高系统的可扩展性。
+  - 通过创建工厂方法，可以将对象创建的粒度进行统一管理，提高系统的可维护性。
+
+  - 简单工厂模式的缺点在于：
+  - 当新增产品时，需要修改工厂类的代码，不符合开闭原则。
+  - 工厂类会承担较多的职责，有可能会变得复杂
