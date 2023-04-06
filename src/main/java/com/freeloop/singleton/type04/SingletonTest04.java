@@ -1,4 +1,4 @@
-package com.freeloop.singleton.type4;
+package com.freeloop.singleton.type04;
 
 /**
  * SingletonTest04
