@@ -1,8 +1,8 @@
-package com.freeloop.simplefactory.pizzastore.order;
+package com.freeloop.factory.simplefactory.pizzastore.order;
 
-import com.freeloop.simplefactory.pizzastore.pizza.CheesePizza;
-import com.freeloop.simplefactory.pizzastore.pizza.GreekPizza;
-import com.freeloop.simplefactory.pizzastore.pizza.Pizza;
+import com.freeloop.factory.simplefactory.pizzastore.pizza.CheesePizza;
+import com.freeloop.factory.simplefactory.pizzastore.pizza.GreekPizza;
+import com.freeloop.factory.simplefactory.pizzastore.pizza.Pizza;
 
 /**
  * SimpleFactory

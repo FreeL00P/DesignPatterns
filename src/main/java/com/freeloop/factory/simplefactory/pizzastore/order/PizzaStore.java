@@ -1,4 +1,4 @@
-package com.freeloop.simplefactory.pizzastore.order;
+package com.freeloop.factory.simplefactory.pizzastore.order;
 
 /**
  * PizzaStore

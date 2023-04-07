@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Java设计模式
 
 ## 一、设计模式七大原则
@@ -237,15 +236,97 @@ public class Client {
 }
 ```
 
-
-
 简单工厂模式的主要特点是通过一个工厂方法来创建对象，而不是通过类的构造器。
 
 - 使用简单工厂模式的优点在于：
   - 客户端代码与产品对象的创建过程分离，降低耦合度。
   - 在新增产品时，仅需适当修改工厂类即可，无需修改客户端代码，提高系统的可扩展性。
   - 通过创建工厂方法，可以将对象创建的粒度进行统一管理，提高系统的可维护性。
-
-  - 简单工厂模式的缺点在于：
+- 简单工厂模式的缺点在于：
   - 当新增产品时，需要修改工厂类的代码，不符合开闭原则。
   - 工厂类会承担较多的职责，有可能会变得复杂
+
+### 工厂方法模式
+
+- 工厂方法模式是一种创建型设计模式，它提供了一种创建对象的方法，将对象的创建委托给其子类来完成。借助工厂方法模式，我们可以将对象的创建和使用分开，从而降低系统耦合度
+
+  ```java
+  /*
+  在工厂方法模式中，我们定义一个抽象的工厂类，其中包含一个创建产品的抽象方法。
+  */
+  
+  public abstract class OrderPizza {
+      //定义一个抽象方法，createPizza,让各个子类自己实现
+      abstract Pizza createPizza(String orderType);
+      public OrderPizza(){
+          String orderType;//订购披萨的类型
+          do {
+              orderType = getType();
+              Pizza pizza = createPizza(orderType);
+              //输出披萨制作工厂
+              pizza.prepare();
+              pizza.bake();
+              pizza.cut();
+              pizza.box();
+          }while(true);
+  
+      }
+      public String getType(){
+          try{
+              BufferedReader strIn = new BufferedReader(new InputStreamReader(System.in));
+              System.out.println("披萨种类:");
+              return strIn.readLine();
+          }catch (Exception e){
+              e.printStackTrace();
+              return "";
+          }
+      }
+  }
+  /*
+  具体的产品由工厂的子类来创建，每个工厂子类都实现了抽象工厂类中的抽象方法，用于创建相应的产品
+  */
+  public class BJOrderPizza extends OrderPizza{
+      @Override
+      Pizza createPizza(String orderType) {
+          System.out.println("制作北京披萨");
+          Pizza pizza=null;
+          if(orderType.equals("cheese")){
+              pizza=new BJCheesePizza();
+          }else if(orderType.equals("pepper")){
+              pizza=new BJPepperPizza();
+          }
+          return pizza;
+      }
+  }
+  
+  public class LDOrderPizza extends OrderPizza{
+      @Override
+      Pizza createPizza(String orderType) {
+          System.out.println("制作伦敦披萨");
+          Pizza pizza=null;
+          if(orderType.equals("cheese")){
+              pizza=new LDCheesePizza();
+          }else if(orderType.equals("pepper")){
+              pizza=new LDPepperPizza();
+          }
+          return pizza;
+      }
+  }
+  public class PizzaStore {
+      public static void main(String[] args) {
+          //创建北京口味的各种pizza
+          String location =new Scanner(System.in).next();
+          if (location.equals("bj")) {
+              new BJOrderPizza();
+          }else if (location.equals("ld")){
+              new LDOrderPizza();
+          }
+  
+      }
+  }
+  ```
+
+- 这种设计模式能够实现代码的可扩展性，当我们需要新增一种产品时，只需要增加相应的产品子类及其工厂子类即可，对现有代码不会造成影响。
+
+- 工厂方法模式的优点包括封装了对象的创建，使得客户端无需关心对象的具体创建过程，增加了系统的灵活性和可扩展性，同时降低了系统的耦合程度。
+- 不足之处是如果工厂类较多，会导致代码复杂度增加。此外，由于工厂方法模式使用了继承来完成对象的创建，因此会增加系统的类的个数和结构的复杂度。

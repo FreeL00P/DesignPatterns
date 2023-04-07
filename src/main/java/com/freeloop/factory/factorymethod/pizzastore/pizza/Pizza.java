@@ -1,4 +1,4 @@
-package com.freeloop.simplefactory.pizzastore.pizza;
+package com.freeloop.factory.factorymethod.pizzastore.pizza;
 
 /**
  * Pizza
