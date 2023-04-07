@@ -330,3 +330,82 @@ public class Client {
 
 - 工厂方法模式的优点包括封装了对象的创建，使得客户端无需关心对象的具体创建过程，增加了系统的灵活性和可扩展性，同时降低了系统的耦合程度。
 - 不足之处是如果工厂类较多，会导致代码复杂度增加。此外，由于工厂方法模式使用了继承来完成对象的创建，因此会增加系统的类的个数和结构的复杂度。
+
+### 抽象工厂模式
+
+- 抽象工厂模式是一种创建型设计模式，它提供了一个接口，让客户端能够创建一系列相关或依赖对象，而无需指定它们的具体类。抽象工厂模式是工厂方法模式的一种变体，它使用一组相关的工厂来创建对象，这些工厂被称为“抽象工厂”。
+
+- 在抽象工厂模式中，抽象工厂定义了一个接口，用于创建一组相关对象，而具体工厂则实现这个接口，并创建具体的对象。每个工厂都可以创建一组相似的对象，但这些对象可能在不同的上下文中使用，因此它们具有不同的具体表现形式。
+
+- 使用抽象工厂模式可以隐藏对象的具体实现细节，只披露接口，从而简化代码，提高系统的可扩展性和灵活性。
+
+- 使用抽象工厂模式可以隐藏对象的具体实现细节，只披露接口，从而简化代码，提高系统的可扩展性和灵活性。
+
+  ```java
+  public interface AbsFactory {
+      //让下面的工厂子类来具体实现
+      Pizza createPizza(String orderType);
+  }
+  public class BJFactory implements AbsFactory{
+      @Override
+      public Pizza createPizza(String orderType) {
+          System.out.println("制作北京披萨");
+          Pizza pizza=null;
+          if(orderType.equals("cheese")){
+              pizza = new BJCheesePizza();
+          }else if(orderType.equals("pepper")){
+              pizza=new BJPepperPizza();
+          }
+          return pizza;
+      }
+  }
+  public class LDFactory implements AbsFactory{
+      @Override
+      public Pizza createPizza(String orderType) {
+          System.out.println("制作伦敦披萨");
+          Pizza pizza=null;
+          if(orderType.equals("cheese")){
+              pizza = new LDCheesePizza();
+          }else if(orderType.equals("pepper")){
+              pizza=new LDPepperPizza();
+          }
+          return pizza;
+      }
+  }
+  public class OrderPizza {
+      AbsFactory absFactory;
+  
+      public OrderPizza(AbsFactory absFactory) {
+          setAbsFactory(absFactory);
+      }
+  
+      private void setAbsFactory(AbsFactory absFactory) {
+          Pizza pizza=null;
+          String orderType ="";
+          this.absFactory=absFactory;
+          do {
+              orderType=this.getType();
+              pizza=absFactory.createPizza(orderType);
+              if (pizza!=null){
+                  pizza.prepare();
+                  pizza.bake();
+                  pizza.cut();
+                  pizza.box();
+              }
+          }while (true);
+      }
+      public String getType(){
+          try{
+              BufferedReader strIn = new BufferedReader(new InputStreamReader(System.in));
+              System.out.println("披萨种类:");
+              return strIn.readLine();
+          }catch (Exception e){
+              e.printStackTrace();
+              return "";
+          }
+      }
+  }
+  
+  ```
+
+  
