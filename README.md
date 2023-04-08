@@ -498,3 +498,103 @@ public class Client {
     3. 创建字节输入流对象: ByteArrayInputStream bis, 用于读取反序列化后的数据；ObjectInputStream ois, 用于将序列化后的数据反序列化成对象。
     4. 将 bos 中的数据转变成 bis 所需的格式，并读取 bis 中的数据，将其反序列化成 DeepProtoType 对象。
     5. 将反序列化后的对象返回。
+
+### 建造者模式
+
+- 建造者模式可以让你更容易地构建复杂的对象，而不必关心对象的内部细节。使用该模式可以将对象的创建过程分解成多个步骤，每个步骤负责创建指定的组件或部分。这些部件最终可以组装成一个完整的复杂对象。这样，建造者模式可以使得类的设计更加模块化，易于维护和扩展。例如，您可以使用建造者模式创建汽车对象，可以先创建车轮组件、座椅组件、发动机组件等，然后再将它们组装成一个完整的汽车对象。
+
+- 建造者模式是一种对象创建型设计模式。它允许您创建具有复杂参数构造函数的对象，同时也可以让您使用步骤来创建该对象的过程。该模式允许您创建不同类型的对象，同时避免需要指定其复杂和多参数构造函数的复杂性。建造者模式将对象的创建过程分解为多个简单的步骤，这些步骤逐个执行以创建最终对象。
+
+- 建造者模式通常由以下几个组件组成：
+
+  - Director: 指挥者，负责管理建造过程，即创建对象的顺序和方式。这个角色应该知道哪些步骤来执行，以便正确创建一个完整的对象；
+  - Abstract Builder: 建造者接口，定义了将来的具体建造者所应该遵守的约定，以便按照规定的步骤来创建复杂对象；
+  - Concrete Builder: 具体建造者，实现建造者接口中的方法以构建和装配产品，该角色负责实际创建对象的任务；
+  - Product: 产品，由多个部件组成的复杂对象。产品类不需要知道创建它的细节，只需提供所需的方法即可。
+
+  建造者模式最大的优点在于封装了对象构造过程，让对象的创建和表示分离，并且易于扩展。因此，建造者模式在涉及创建复杂对象的情况下非常有用，例如创建复杂的对象，或者对象包含许多部分或属性。
+
+  ```java
+  @Data
+  public class House {
+      private String basic;
+      private String walls;
+      private String roofed;
+  }
+  //抽象的建造者
+  public abstract class HouseBuilder {
+      protected House house=new House();
+      //将建造的流程写好，抽象方法
+      public abstract void buildBasic();
+      public abstract void buildWalls();
+      public abstract void roofed();
+      //建造房子
+      public House buildHouse(){
+          return house;
+      }
+  }
+  public class HighHouseBuilder extends HouseBuilder{
+      @Override
+      public void buildBasic() {
+          System.out.println("给高楼打地基");
+      }
+  
+      @Override
+      public void buildWalls() {
+          System.out.println("给高楼砌墙");
+      }
+  
+      @Override
+      public void roofed() {
+          System.out.println("给高楼盖屋顶");
+      }
+  }
+  public class CommonHouseBuilder extends HouseBuilder{
+      @Override
+      public void buildBasic() {
+          System.out.println("给普通房子打地基");
+      }
+  
+      @Override
+      public void buildWalls() {
+          System.out.println("给普通房子砌墙");
+      }
+  
+      @Override
+      public void roofed() {
+          System.out.println("给普通房子封顶");
+      }
+  }
+  public class HouseDirector {
+      HouseBuilder houseBuilder=null;
+  
+      public HouseDirector(HouseBuilder houseBuilder) {
+          this.houseBuilder = houseBuilder;
+      }
+  
+      public void setHouseBuilder(HouseBuilder houseBuilder) {
+          this.houseBuilder = houseBuilder;
+      }
+      //指挥
+      //如何处理建造房子的流程，交给指挥者
+      public House constructHouse(){
+          houseBuilder.buildBasic();
+          houseBuilder.buildWalls();
+          houseBuilder.roofed();
+          return houseBuilder.buildHouse();
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //盖普通房子
+          CommonHouseBuilder commonHouseBuilder = new CommonHouseBuilder();
+          //准备创建房子的指挥者
+          HouseDirector houseDirector = new HouseDirector(commonHouseBuilder);
+          //完成盖房子
+          House house = houseDirector.constructHouse();
+          System.out.println("house = " + house);
+      }
+  }
+  ```
+
+  ![image-20230408224019888](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/image-20230408224019888.png)
