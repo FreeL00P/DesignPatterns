@@ -424,3 +424,77 @@ public class Client {
 抽象工厂模式是一种能够生产不同产品族的工厂模式，其基本思想是定义一个抽象工厂接口，然后在不同的具体工厂中实现这个接口，从而实现对不同产品族的创建。抽象工厂是允许有多个具体工厂类的工厂模式，每个具体工厂可以生产多种产品。
 
 总的来说，简单工厂模式适用于创建单一产品，工厂方法模式适用于创建多个具体产品，抽象工厂模式适用于创建不同产品族。选择哪个模式要根据具体需求和实现情况来考虑。
+
+### 原型模式
+
+- 深拷贝和浅拷贝
+
+  - 浅拷贝是指将一个对象复制到一个新的对象中，两者的基本数据类型的值相同，但是对于引用类型，两者对应的变量指向的是同一个引用对象，对其中一个的改变会影响另一个。
+  - 深拷贝是指将一个对象复制到一个新的对象中，不仅两者的基本数据类型的值相同，而且引用类型的变量也指向了新的引用对象，两者互不干扰。
+
+- 浅拷贝 默认的clone()方法就是浅拷贝
+
+- 深拷贝
+
+  - 方法1 使用clone方法
+
+  ```java
+  //深拷贝 
+      @Override
+      protected Object clone() throws CloneNotSupportedException {
+          Object deep=null;
+          try {
+              //这里完成对基本（数据类型）属性的克隆
+              deep = super.clone();
+              //对引用类型的属性进行单独处理
+              DeepProtoType deepProtoType=(DeepProtoType) deep;
+              deepProtoType.deepCloneTarget=(DeepCloneableTarget) deepCloneTarget.clone();
+  
+          }catch (CloneNotSupportedException e){
+  
+          }
+          return super.clone();
+      }
+  ```
+
+  - 方法2 通过对象序列化实现
+
+    ```java
+    public Object deepClone(){
+            //创建到流对象
+            ByteArrayOutputStream bos=null;
+            ObjectOutputStream oos=null;
+            ByteArrayInputStream bis=null;
+            ObjectInputStream ois=null;
+            try {
+                //序列化
+                bos=new ByteArrayOutputStream();
+                oos=new ObjectOutputStream(bos);
+                oos.writeObject(this);//当前对象以对象流方式输出
+                //反序列化
+                bis=new ByteArrayInputStream(bos.toByteArray());
+                ois=new ObjectInputStream(bis);
+                return (DeepProtoType) ois.readObject();
+            }catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }finally {
+                try {
+                    if (bos != null) bos.close();
+                    if (oos != null) oos.close();
+                    if (bis != null) bis.close();
+                    if (ois != null) ois.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    ```
+
+    这段代码是实现了通过对象的深拷贝来复制一个对象，具体实现的过程如下：
+
+    1. 创建字节流对象: ByteArrayOutputStream bos, 用于存储序列化后的对象数据；ObjectOutputStream oos, 用于将对象序列化后的数据写入到 bos 中。
+    2. 调用 oos.writeObject(this) 将当前对象实例写入到 bos 中，实现了对象的序列化，并存储在 bos 中。
+    3. 创建字节输入流对象: ByteArrayInputStream bis, 用于读取反序列化后的数据；ObjectInputStream ois, 用于将序列化后的数据反序列化成对象。
+    4. 将 bos 中的数据转变成 bis 所需的格式，并读取 bis 中的数据，将其反序列化成 DeepProtoType 对象。
+    5. 将反序列化后的对象返回。
