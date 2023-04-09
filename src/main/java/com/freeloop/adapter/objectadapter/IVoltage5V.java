@@ -1,4 +1,4 @@
-package com.freeloop.adapter.classadapter;
+package com.freeloop.adapter.objectadapter;
 
 /**
  * IVoltage5V
