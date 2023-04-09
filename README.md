@@ -598,3 +598,169 @@ public class Client {
   ```
 
   ![image-20230408224019888](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/image-20230408224019888.png)
+
+### 适配器模式
+
+- 类适配器
+
+  - 类适配器是一种适配器设计模式，它可以将一个类（适配器）的接口转换为另一个类（被适配者）的接口，从而使得客户端可以使用被适配者的接口来访问适配器中的功能。在类适配器中，适配器继承自被适配者类，并实现客户端所期望的接口。
+  - 类适配器的优势在于：
+    1. 可以通过继承被适配者类来复用被适配者的代码和功能。
+    2. 客户端可以直接访问被适配者类中的所有方法和属性。
+  - 类适配器的缺点在于：
+    1. 由于适配器需要继承被适配者类，因此适配器只能适配一个被适配者类，无法适配被适配者类的多个子类。
+    2. 适配器与被适配者之间是通过继承关系实现的，因此适配器的实现可能受到被适配者类的限制，而无法灵活地实现客户端所期望的接口。
+    3. 在被适配者类中的方法不能够被客户端重写或覆盖，这可能会导致一些问题。
+
+  ```java
+  public class Voltage220V {
+      public int output220V(){
+          int src=220;
+          System.out.println("电压="+src+"伏");
+          return src;
+      }
+  }
+  public interface IVoltage5V {
+      int output5V();
+  }
+  public class VoltageAdapter extends Voltage220V implements IVoltage5V {
+      @Override
+      public int output5V() {
+          //获取到220V电压
+          int srcV = output220V();
+          //转成5V
+          return srcV/44;
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          System.out.println("适配器模式");
+          Phone phone = new Phone();
+          phone.charging(new VoltageAdapter());
+      }
+  }
+  ```
+
+  
+
+- 接口适配器
+
+  - 接口适配器是一种适配器设计模式，它通过在一个适配器中定义一个占位符接口（即接口中的所有方法都没有实现），从而使得客户端只需要实现它所需要的接口方法，而无需实现所有的方法。
+
+  - 接口适配器通常用来解决以下问题：
+
+    1. 当一个接口中定义了多个方法，但是客户端只需要使用其中的部分方法时，使用接口适配器可以避免客户端实现多余的方法。
+    2. 当一个接口需要进行修改或扩展时，使用接口适配器可以避免对所有实现该接口类的修改。
+
+  - 与其他适配器不同，接口适配器并不需要持有被适配者的实例或者继承被适配者类，而是通过定义一个占位符接口来实现适配器。客户端只需要实现所需要的接口方法即可
+
+  - 接口适配器的优势在于：
+
+    1. 客户端只需要实现所需要的方法，避免了实现多余的方法，提高了代码的可读性和可维护性。
+    2. 当一个接口需要修改时，只需要修改占位符接口，而无需修改所有实现该接口的类。
+
+  - 接口适配器的缺点在于：
+
+    1. 占位符接口的定义可能会比较复杂，需要花费更多的时间和精力。
+    2. 如果一个接口中的方法数量较多，使用接口适配器可能会导致占位符接口中方法数量过多，影响代码的可读性。
+
+    ```java
+    public interface Interface4 {
+        void m1();
+        void m2();
+        void m3();
+        void m4();
+    }
+    public abstract class AbsAdapter implements Interface4{
+        @Override
+        public void m1() {
+    
+        }
+    
+        @Override
+        public void m2() {
+    
+        }
+    
+        @Override
+        public void m3() {
+    
+        }
+    
+        @Override
+        public void m4() {
+    
+        }
+    }
+    public class Client {
+        public static void main(String[] args) {
+            AbsAdapter absAdapter= new AbsAdapter() {
+                //只需要去覆盖我们需要使用的接口方法
+                @Override
+                public void m1() {
+                    System.out.println("使用了m1方法");
+                }
+            };
+            absAdapter.m1();
+        }
+    }
+    ```
+
+    
+
+- 对象适配器
+
+  - 它使得一个类（适配器）可以将其所持有的另一个类（被适配者）的接口转换为客户端所期望的另一种接口。在对象适配器中，适配器持有被适配者的一个实例，并且将客户端的请求转发给被适配者。
+
+  - 对象适配器的优势在于：
+
+    1. 可以适配多个被适配者类。
+    2. 适配器与被适配者之间松耦合，使得适配器可以被更加灵活地重用。
+
+  - 对象适配器的缺点在于：
+
+    1. 客户端只能访问被适配者类中已有的接口，无法访问被适配者类中的其他方法。
+    2. 由于适配器需要持有被适配者的实例，因此如果被适配者本身是一个大型或重量级对象，可能会导致内存占用过高。
+
+    ```java
+    public class Voltage220V {
+        public int output220V(){
+            int src=220;
+            System.out.println("电压="+src+"伏");
+            return src;
+        }
+    }
+    public interface IVoltage5V {
+        int output5V();
+    }
+    public class VoltageAdapter implements IVoltage5V {
+        private Voltage220V voltage220V;
+    
+        public VoltageAdapter(Voltage220V voltage220V) {
+            this.voltage220V = voltage220V;
+        }
+    
+        @Override
+        public int output5V() {
+            int dst=0;
+            if(voltage220V!=null){
+                System.out.println("使用对象适配器进行转换");
+                //获取到220V电压
+                int srcV =voltage220V.output220V();
+                //转成5V
+                dst=srcV/44;
+            }
+            return dst;
+        }
+    }
+    public class Client {
+        public static void main(String[] args) {
+            System.out.println("适配器模式");
+            Phone phone = new Phone();
+            //传入被适配器
+            phone.charging(new VoltageAdapter(new Voltage220V()));
+        }
+    }
+    ```
+
+    
