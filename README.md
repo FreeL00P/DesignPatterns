@@ -5,7 +5,7 @@
 #### 1、单一职责原则
 
 - 介绍：
-  ```text
+  
   对于类来说，每个类都应该只负责一个职责。如果A类负责两个不同的职责：职责1，职责2，当职责1的需求变更要改变A时，可能造成职责2执行错误，所以需要将类A的粒度分解。
 
 - 降低类的复杂度，一个类只负责一个功能
@@ -118,12 +118,10 @@
 
 - 懒汉式
 
-  ```text
   其核心思想是在需要获取实例时才进行对象的实例化。相比于饿汉式，懒汉式的实现需要注意多线		程环境下的线程安全问题。
   在懒汉式的实现过程中，可以使用一个私有的静态变量来存储该实例，但是不进行初始化，直到第一次使用该实例时再进行初始化，
   并返回该实例的引用。为了确保多线程环境下的线程安全问题，可以使用 synchronized 关键字或者双重检测锁来实现线程安全的访问。
-  ```
-
+  
   - 线程不安全的懒汉式  
 
     ```java
@@ -143,7 +141,7 @@
         }
     }
     ```
-
+  
   - 线程安全的懒汉式
 
     ```java
@@ -167,7 +165,7 @@
         }
     }
     ```
-
+  
   - 内部类懒汉式
 
     ```java
@@ -188,7 +186,7 @@
     }
     
     ```
-
+  
     无论使用哪种方式，懒汉式单例模式都是在第一次使用时才进行实例化，避免了在类加载时就创建单例对象所带来的性能问题。但是需要注意，第一种方式并不能保证线程安全，因此不推荐使用。其他两种方式能够保证线程安全且高效，因此推荐使用。
 
 ### 简单工厂模式
@@ -763,4 +761,118 @@ public class Client {
     }
     ```
 
-    
+
+### 桥接模式
+
+- 桥接模式通过将抽象部分和实现部分分离，使得它们可以独立地变化。在桥接模式中，我们使用一个桥接类来连接抽象部分和实现部分，这个桥接类包含了抽象类的引用，以及一个实现类的引用。这样，我们就可以动态地改变抽象部分和实现部分之间的关系。
+
+  ```java
+  public interface Brand {
+      void open();
+      void close();
+      void call();
+  }
+  public abstract class Phone {
+      private Brand brand;
+  
+      public Phone(Brand brand) {
+          super();
+          this.brand = brand;
+      }
+  
+      protected void open() {
+          this.brand.open();
+      }
+      protected void close() {
+          this.brand.close();
+      }
+      protected void call() {
+          this.brand.call();
+      }
+  }
+  public class FoldPhone extends Phone{
+      public FoldPhone(Brand brand) {
+          super(brand);
+      }
+      public void open() {
+          super.open();
+          System.out.println("折叠手机");
+      }
+      public void close() {
+          super.close();
+          System.out.println("折叠手机");
+      }
+      public void call() {
+          super.call();
+          System.out.println("折叠手机");
+      }
+  }
+  public class UpRightPhone extends Phone{
+      public UpRightPhone(Brand brand) {
+          super(brand);
+      }
+  
+  
+      public void open() {
+          super.open();
+          System.out.println("直立手机");
+      }
+      public void close() {
+          super.close();
+          System.out.println("直立手机");
+      }
+      public void call() {
+          super.call();
+          System.out.println("直立手机");
+      }
+  }
+  public class Vivo implements Brand{
+      @Override
+      public void open() {
+          System.out.println("vivo手机开机");
+      }
+  
+      @Override
+      public void close() {
+          System.out.println("vivo手机关机");
+      }
+  
+      @Override
+      public void call() {
+          System.out.println("vivo手机打电话");
+      }
+  }
+  public class XIaoMI implements Brand{
+      @Override
+      public void open() {
+          System.out.println("小米手机开机");
+      }
+  
+      @Override
+      public void close() {
+          System.out.println("小米手机关机");
+      }
+  
+      @Override
+      public void call() {
+          System.out.println("小米手机打电话");
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //获取折叠手机
+          Phone foldPhone = new FoldPhone(new XIaoMI());
+          foldPhone.open();
+          foldPhone.close();
+          foldPhone.close();
+  
+          Phone foldPhone1 = new UpRightPhone(new Vivo());
+          foldPhone1.open();
+          foldPhone1.call();
+          foldPhone1.close();
+  
+      }
+  }
+  ```
+
+  

@@ -13,6 +13,7 @@ public class Client {
         foldPhone.open();
         foldPhone.close();
         foldPhone.close();
+
         Phone foldPhone1 = new UpRightPhone(new Vivo());
         foldPhone1.open();
         foldPhone1.call();
