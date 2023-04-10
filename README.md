@@ -876,3 +876,152 @@ public class Client {
   ```
 
   ![image-20230410100333803](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/image-20230410100333803.png)
+
+### 装饰器模式
+
+- 装饰器模式是一种结构型设计模式，它允许在运行时动态地新增一些行为到一个对象中，而不需要修改它的源代码。这种设计模式通过将对象封装在装饰器类中，以增加对象的功能和特性，而不需要创建一个新的子类。
+
+- 这种模式适用于：
+
+  - 需要在不修改原始对象源代码的情况下增加对象功能的场景；
+
+  - 需要在运行时为一个对象增加多个行为的场景；
+
+  - 在继承关系中，父类结构固定，但是需要新增一些功能的场景。
+
+- 装饰器模式的实现可以基于类或者基于函数。在基于类实现中，装饰器类通常继承自原始对象的类，然后通过组合方式在运行时为原始对象增加新的职责。在基于函数实现中，装饰器函数接收一个函数作为参数，然后返回一个新的函数，在这个新的函数中增加了新的行为。
+
+  抽象类
+
+  ```java
+  public abstract class Drink {
+      public String des;
+      private float price=0.0f;
+      //计算费用的抽象方法
+      public abstract  float cost();
+  
+      public String getDes() {
+          return des;
+      }
+  
+      public void setDes(String des) {
+          this.des = des;
+      }
+  
+      public float getPrice() {
+          return price;
+      }
+  
+      public void setPrice(float price) {
+          this.price = price;
+      }
+  
+      @Override
+      public String toString() {
+          return "Drink{" +
+                  "描述='" + des + '\'' +
+                  ", 价格=" + price +
+                  '}';
+      }
+  }
+  
+  ```
+
+  装饰类
+
+  ```java
+  public class Decorator extends Drink{
+      private Drink obj;
+      public Decorator(Drink obj) {
+          this.obj = obj;
+      }
+      @Override
+      public float cost() {
+          return super.getPrice()+ obj.cost();
+      }
+  
+  
+  
+      @Override
+      public String getDes() {
+          return super.des
+                  +" "+super.getPrice()
+                  +"&&"+obj.getDes();
+      }
+  }
+  ```
+  
+  品类
+  
+  ```java
+  public class Coffee extends Drink{
+      @Override
+      public float cost() {
+          return super.getPrice();
+      }
+  
+  }
+  ```
+  
+  单品类
+  
+  ```javav
+  public class ShortBlack extends Coffee{
+      public ShortBlack() {
+          this.setDes("ShortBlack");
+          this.setPrice(4.0f);
+      }
+  }
+  public class LongBlack extends Coffee {
+      public LongBlack() {
+          this.setDes("美式咖啡");
+          this.setPrice(5.0f);
+      }
+  }
+  ```
+  
+  装饰类
+  
+  ```java
+  public class Soy extends Decorator{
+      public Soy(Drink obj) {
+          super(obj);
+          setDes("豆浆");
+          setPrice(1.5f);
+      }
+  }
+  public class Milk extends Decorator{
+      public Milk(Drink obj) {
+          super(obj);
+          setDes("牛奶");
+          setPrice(2.0f);
+      }
+  }
+  public class Espresso extends Coffee{
+      public Espresso(){
+          this.setDes("意大利咖啡");
+          this.setPrice(6.0f);
+      }
+  }
+  ```
+  
+  客户端
+  
+  ```
+  public class CoffeeBar {
+      public static void main(String[] args) {
+          //1.点一份longBlack
+          Drink order = new LongBlack();
+          System.out.println("order = " +order.getDes()+ order.cost());
+          //2.加入一份牛奶
+          order=new Milk(order);
+          System.out.println("order = "+order.getDes() + order.cost());
+          //3.加入一份巧克力
+          order=new Chocolate(order);
+          System.out.println("order = " +order.getDes()+ order.cost());
+      }
+  }
+  ```
+
+​		![image-20230410120740431](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/image-20230410120740431.png)
+
