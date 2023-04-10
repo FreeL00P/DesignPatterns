@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.freeloop.decorator</OriginalElement>
+  <nodes>
+    <node x="240.0" y="383.0">com.freeloop.decorator.LongBlack</node>
+    <node x="-68.0" y="231.0">com.freeloop.decorator.Decorator</node>
+    <node x="384.0" y="383.0">com.freeloop.decorator.Espresso</node>
+    <node x="516.0" y="383.0">com.freeloop.decorator.ShortBlack</node>
+    <node x="383.5" y="243.0">com.freeloop.decorator.Coffee</node>
+    <node x="-202.0" y="383.0">com.freeloop.decorator.Soy</node>
+    <node x="80.71296296296299" y="487.0">com.freeloop.decorator.CoffeeBar</node>
+    <node x="133.25" y="-14.0">com.freeloop.decorator.Drink</node>
+    <node x="-68.0" y="383.0">com.freeloop.decorator.Chocolate</node>
+    <node x="102.0" y="383.0">com.freeloop.decorator.Milk</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.freeloop.decorator.CoffeeBar" target="com.freeloop.decorator.Milk" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="0.0" y="27.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.Decorator" target="com.freeloop.decorator.Drink" relationship="GENERALIZATION">
+      <point x="37.5" y="-51.0" />
+      <point x="44.5" y="211.0" />
+      <point x="209.75" y="211.0" />
+      <point x="209.75" y="201.0" />
+      <point x="240.5" y="201.0" />
+      <point x="35.75" y="97.5" />
+    </edge>
+    <edge source="com.freeloop.decorator.Coffee" target="com.freeloop.decorator.Drink" relationship="GENERALIZATION">
+      <point x="0.0" y="-39.0" />
+      <point x="440.0" y="211.0" />
+      <point x="209.75" y="211.0" />
+      <point x="209.75" y="201.0" />
+      <point x="240.5" y="201.0" />
+      <point x="35.75" y="97.5" />
+    </edge>
+    <edge source="com.freeloop.decorator.Chocolate" target="com.freeloop.decorator.Decorator" relationship="GENERALIZATION">
+      <point x="0.0" y="-27.0" />
+      <point x="0.0" y="51.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.ShortBlack" target="com.freeloop.decorator.Coffee" relationship="GENERALIZATION">
+      <point x="0.0" y="-27.0" />
+      <point x="579.5" y="358.0" />
+      <point x="440.0" y="358.0" />
+      <point x="0.0" y="39.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.LongBlack" target="com.freeloop.decorator.Coffee" relationship="GENERALIZATION">
+      <point x="0.0" y="-27.0" />
+      <point x="302.0" y="358.0" />
+      <point x="440.0" y="358.0" />
+      <point x="0.0" y="39.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.Milk" target="com.freeloop.decorator.Decorator" relationship="GENERALIZATION">
+      <point x="0.0" y="-27.0" />
+      <point x="161.0" y="358.0" />
+      <point x="7.0" y="358.0" />
+      <point x="0.0" y="51.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.Soy" target="com.freeloop.decorator.Decorator" relationship="GENERALIZATION">
+      <point x="0.0" y="-27.0" />
+      <point x="-145.0" y="358.0" />
+      <point x="7.0" y="358.0" />
+      <point x="0.0" y="51.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.Espresso" target="com.freeloop.decorator.Coffee" relationship="GENERALIZATION">
+      <point x="0.0" y="-27.0" />
+      <point x="0.0" y="39.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.CoffeeBar" target="com.freeloop.decorator.Chocolate" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="160.712962962963" y="462.0" />
+      <point x="7.0" y="462.0" />
+      <point x="0.0" y="27.0" />
+    </edge>
+    <edge source="com.freeloop.decorator.Decorator" target="com.freeloop.decorator.Drink" relationship="TO_ONE">
+      <point x="-37.5" y="-51.0" />
+      <point x="-30.5" y="201.0" />
+      <point x="169.0" y="201.0" />
+      <point x="-35.75" y="97.5" />
+    </edge>
+    <edge source="com.freeloop.decorator.CoffeeBar" target="com.freeloop.decorator.LongBlack" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="160.712962962963" y="462.0" />
+      <point x="302.0" y="462.0" />
+      <point x="0.0" y="27.0" />
+    </edge>
+  </edges>
+  <settings layout="分层" zoom="1.3622704507512524" showDependencies="true" x="125.37806372549005" y="272.1703431372548" />
+  <SelectedNodes />
+  <Categories>
+    <Category>内部类</Category>
+    <Category>字段</Category>
+    <Category>属性</Category>
+    <Category>方法</Category>
+    <Category>构造函数</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

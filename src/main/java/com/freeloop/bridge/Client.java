@@ -18,6 +18,5 @@ public class Client {
         foldPhone1.open();
         foldPhone1.call();
         foldPhone1.close();
-
     }
 }
