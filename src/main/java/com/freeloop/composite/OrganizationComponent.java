@@ -39,12 +39,4 @@ public abstract class OrganizationComponent {
     public void setDes(String des) {
         this.des = des;
     }
-
-    @Override
-    public String toString() {
-        return "OrganizationComponent{" +
-                "name='" + name + '\'' +
-                ", des='" + des + '\'' +
-                '}';
-    }
 }

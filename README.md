@@ -1025,3 +1025,176 @@ public class Client {
 
 ​		![image-20230410120740431](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/image-20230410120740431.png)
 
+### 组合模式
+
+- 组合模式是一种常用的结构型设计模式，它通过将对象组合成树状结构，可以让客户端以统一的方式处理单个对象和组合对象。这种模式可以让我们更加灵活地构建层级结构，以及处理层级结构中的对象，让结构更清晰，代码更易于理解。
+
+- 组合模式适用于以下情况：
+
+  - 需要构建层级结构的场景，如文件系统、组织架构等；
+
+  - 希望客户端能够以一种统一的方式处理单个对象和组合对象的场景；
+
+  - 希望在层级结构中增加或者删除某个对象时，对其他对象没有影响。
+
+- 在组合模式中，有两种对象类型：组合对象和叶子对象。组合对象包含其他组合对象或者叶子对象，叶子对象没有子对象，可以被当做基本对象来处理。组合对象和叶子对象都实现了相同的接口，可以在客户端以一种统一的方式来使用。
+
+```java
+//接口类
+public abstract class OrganizationComponent {
+    private String name;
+    private String des;
+    protected void add(OrganizationComponent organizationComponent){
+        throw new UnsupportedOperationException();
+    }
+    protected void remove(OrganizationComponent organizationComponent){
+        throw new UnsupportedOperationException();
+    }
+    //方法print
+    protected abstract void print();
+
+    public OrganizationComponent(String name, String des) {
+        super();
+        this.name = name;
+        this.des = des;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDes() {
+        return des;
+    }
+
+    public void setDes(String des) {
+        this.des = des;
+    }
+}
+//组合对象
+public class University extends OrganizationComponent{
+
+    List<OrganizationComponent> organizationComponents=new ArrayList<>();
+    public University(String name, String des) {
+        super(name, des);
+    }
+
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    @Override
+    protected void add(OrganizationComponent organizationComponent) {
+        organizationComponents.add(organizationComponent);
+    }
+
+    @Override
+    protected void remove(OrganizationComponent organizationComponent) {
+        organizationComponents.remove(organizationComponent);
+    }
+    //print()方法就是输出University包含的学院
+    @Override
+    protected void print() {
+        System.out.println("=========="+this.getName()+"==========");
+        //打印出
+        for (OrganizationComponent organizationComponent : organizationComponents) {
+            organizationComponent.print();
+        }
+    }
+
+}
+//组合对象
+public class Collage extends OrganizationComponent{
+    //这个list中存放的是Department
+    List<OrganizationComponent> organizationComponents=new ArrayList<>();
+
+    public Collage(String name, String des) {
+        super(name, des);
+    }
+
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    @Override
+    protected void add(OrganizationComponent organizationComponent) {
+        organizationComponents.add(organizationComponent);
+    }
+
+    @Override
+    protected void remove(OrganizationComponent organizationComponent) {
+        organizationComponents.remove(organizationComponent);
+    }
+    //print()方法就是输出University包含的学院
+    @Override
+    protected void print() {
+        System.out.println("=========="+this.getName()+"==========");
+        //打印出
+        for (OrganizationComponent organizationComponent : organizationComponents) {
+            organizationComponent.print();
+        }
+    }
+}
+//叶子节点
+public class Department extends OrganizationComponent{
+
+    public Department(String name, String des) {
+        super(name, des);
+    }
+
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    @Override
+    public String getDes() {
+        return super.getDes();
+    }
+
+    @Override
+    protected void print() {
+        System.out.println(this.getName());
+    }
+}
+```
+
+运行程序
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        //从大到小创建对象
+        OrganizationComponent university = new University("湖南工厂学院", "学校");
+        OrganizationComponent collage = new Collage("计算机学院", "计算机");
+        OrganizationComponent collage1 = new Collage("化学学院", "化学");
+        OrganizationComponent collage2 = new Collage("数学学院", "数学");
+        collage.add(new Department("软件工程", "软工"));
+        collage.add(new Department("计算机科学与技术", "码农"));
+        collage.add( new Department("计算机网络", "网工"));
+        university.add(collage);
+        university.add(collage1);
+        university.add(collage2);
+        university.print();
+    }
+}
+```
+
+运行结果
+
+```text
+==========湖南工厂学院==========
+==========计算机学院==========
+软件工程
+计算机科学与技术
+计算机网络
+==========化学学院==========
+==========数学学院==========
+```
+
