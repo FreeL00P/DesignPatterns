@@ -1254,3 +1254,110 @@ public class Client {
   ```
 
   在上述示例中，`SystemA` 和 `SystemB` 是两个复杂的子系统，客户端需要了解内部实现才能操作。而 `Facade` 类则是一个外观，封装了 `SystemA` 和 `SystemB` 的操作，在客户端调用时只需要操作 `Facade` 类，无需关心内部细节。这种设计能够提高代码的灵活性和可维护性，同时也能提高客户端的操作便捷性
+
+### 享元模式
+
+- 享表示共享，元表示对象
+
+- 系统中有大量对象，这些对象消耗大量内存，并且对象的状态大部分可以外部化时，我们就可以考虑选用享元模式
+
+- 用唯一标识码判断，如果在内存中有，则返回这个唯一的标识码标识的对象，用HashMap存储
+
+- 享元模式提高了系统的复杂度，需要分离出内部状态和外部状态而外部状态具有固化特性，不应该随着内部状态的改变而改变，这是我们使用享元模式需要注意的地方
+
+- 使用享元模式时，注意划分内部状态和外部状态，并且需要有一个工厂内加以控制
+
+- 享元模式经典的应用场景是需要使用到缓冲池的场景，比如String常量池，数据库连接池。
+
+- 享元模式是一种结构型设计模式，它的主要目的是通过分享对象来尽量减少内存使用量。享元模式将一个对象分成两个部分：内部状态（Intrinsic State）和外部状态（Extrinsic State）。
+
+  内部状态指的是对象的一些固有属性，这些属性可以在对象被创建时进行初始化，一旦初始化后就不会发生改变。因此，所有实例间内部状态相同的对象可以共享同一个存储位置，而不需要每个对象都创建一个存储位置。
+
+  外部状态指的是对象的一些变化属性，这些属性可能在对象创建后会发生改变。因此，不同实例之间的外部状态是不同的，不能共享同一个存储位置。在使用享元模式时，需要将这些外部状态从对象中拆分出来，并作为参数传递给对象的操作方法。
+
+  以围棋游戏为例，棋子的内部状态是其颜色（黑色或白色），而外部状态指的是其位置。在使用享元模式时，可以将所有颜色相同的棋子共享同一个对象，因为它们的内部状态相同，而将不同位置的棋子作为外部状态传递给棋子的操作方法。这样可以大大减少内存使用量。
+
+  ```java
+  public abstract class WebSite {
+     public abstract void use(User user);
+  }
+  public class ConcreteWebSite extends WebSite{
+      //共享的部分，内部状态
+      private String type="";//网站发布的类型
+      @Override
+      public void use(User user) {
+          System.out.println("网站的发布形式为"+type);
+          System.out.println("使用者"+user.getUsername());
+      }
+  
+      public ConcreteWebSite(String type) {
+          this.type = type;
+      }
+  }
+  public class WebSiteFactory {
+      //集合，充当池的作用
+      private HashMap<String,ConcreteWebSite> pool=new HashMap();
+      //根据网站的类型返回一个网站，如果没有就创建就创建一个网站并放入到池中，并返回
+      public WebSite getWebSiteCategory(String type){
+          if (!pool.containsKey(type)){
+              //创建一个
+              pool.put(type,new ConcreteWebSite(type));
+          }
+          return (WebSite) pool.get(type);
+      }
+      //获取网站分类总数
+      public int getWebSiteCount(){
+          return pool.size();
+      }
+  }
+  //享元模式的外部状态
+  public class User {
+      private String username;
+  
+      public String getUsername() {
+          return username;
+      }
+  
+      public void setUsername(String username) {
+          this.username = username;
+      }
+  
+      public User(String username) {
+          this.username = username;
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //创建一个工厂类
+          WebSiteFactory webSiteFactory = new WebSiteFactory();
+          //客户要一个以新闻形式发布的网站
+          WebSite web1 = webSiteFactory.getWebSiteCategory("news");
+          web1.use(new User("cxk"));
+          WebSite web2= webSiteFactory.getWebSiteCategory("news");
+          web1.use(new User("cxk2"));
+          WebSite web3 = webSiteFactory.getWebSiteCategory("news");
+          web1.use(new User("cxk3"));
+          WebSite web4 = webSiteFactory.getWebSiteCategory("news");
+          web1.use(new User("cxk4"));
+          //获取webSite大小
+          int webSiteCount = webSiteFactory.getWebSiteCount();
+          System.out.println("webSiteCount = " + webSiteCount);
+      }
+  }
+  ```
+
+  运行结果
+
+  ```\
+  网站的发布形式为news
+  使用者cxk
+  网站的发布形式为news
+  使用者cxk2
+  网站的发布形式为news
+  使用者cxk3
+  网站的发布形式为news
+  使用者cxk4
+  webSiteCount = 1
+  ```
+
+  
