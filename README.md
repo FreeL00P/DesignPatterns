@@ -1198,3 +1198,59 @@ public class Client {
 ==========数学学院==========
 ```
 
+### 外观模式
+
+- 外观模式对外屏蔽了子系统的细节，因此外观模式降低了客户端对子系统的使用的复杂性
+
+- 外观模式对客户端与子系统之间的耦合关系，让子系统内部更易维护和扩展
+
+- 通过合理的使用外观模式，可以帮我们更好的划分访问的层次
+
+- 当系统需要分层设计时，可以考虑使用外观模式
+
+- 在维护一个遗留的大系统时，可能这个系统已经变得非常难以维护和扩展，此时可以考虑为新系统开发一个外观类，来提供遗留系统的比较清晰简单的接口，让新系统与外观类交互，提高复用性
+
+- 不能过多的或者不合理的使用外观模式，使用外观模式好，还是直接调用模块好，要以让系统更加有层次，有利于维护为目的
+
+  ```java
+  // 子系统A
+  class SystemA {
+      public void operationA() {
+          System.out.println("SystemA operation");
+      }
+  }
+  
+  // 子系统B
+  class SystemB {
+      public void operationB() {
+          System.out.println("SystemB operation");
+      }
+  }
+  
+  // 外观类
+  class Facade {
+      private SystemA systemA;
+      private SystemB systemB;
+      
+      public Facade() {
+          systemA = new SystemA();
+          systemB = new SystemB();
+      }
+  
+      public void operate() {
+          systemA.operationA();
+          systemB.operationB();
+      }
+  }
+  
+  // 客户端
+  public class Client {
+      public static void main(String[] args) {
+          Facade facade = new Facade();
+          facade.operate();
+      }
+  }
+  
+  ```
+
+  在上述示例中，`SystemA` 和 `SystemB` 是两个复杂的子系统，客户端需要了解内部实现才能操作。而 `Facade` 类则是一个外观，封装了 `SystemA` 和 `SystemB` 的操作，在客户端调用时只需要操作 `Facade` 类，无需关心内部细节。这种设计能够提高代码的灵活性和可维护性，同时也能提高客户端的操作便捷性
