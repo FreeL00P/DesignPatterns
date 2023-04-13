@@ -10,5 +10,4 @@ public class TeacherDao {
     public void teach(){
         System.out.println("Cglib代理，不需要实现接口");
     }
-
 }

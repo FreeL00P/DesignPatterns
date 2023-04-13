@@ -1484,5 +1484,65 @@ public class Client {
   老师正在授课中......
   ```
 
+#### Cglib动态代理
+
+​	优点
+
+- 相对于 JDK 动态代理，它可以代理没有实现接口的类。
+- 生成的代理类是目标对象的子类，因此可以重写目标对象的方法，实现代理逻辑。
+- CGLIB 库性能比 JDK 动态代理高，因为它使用字节码生成技术直接对目标对象进行操作，而不是通过反射调用目标方法。
+
+​    缺点
+
+- 由于 CGLIB 是直接操作字节码生成代理类，因此可能会有一些类加载方面的问题。
+
+- 由于它是生成子类来实现代理，因此如果目标类被final关键字修饰，CGLIB就无法对其进行代理，会导致代理失败的情况。
+
+  ```java
+  public class TeacherDao {
+      public void teach(){
+          System.out.println("Cglib代理，不需要实现接口");
+      }
+  }
+  public class ProxyFactory implements MethodInterceptor{
+      //维护一个目标对象
+      private Object target;
+      //传入一个被代理的对象
+      public ProxyFactory(Object target) {
+          this.target = target;
+      }
+      //返回一个代理对象，目标对象的代理对象
+      public Object getProxyInstance(){
+          //创建一个工具类
+          Enhancer enhancer = new Enhancer();
+          //设置父类
+          enhancer.setSuperclass(target.getClass());
+          //设置回调函数
+          enhancer.setCallback(this);
+          //创建子类对象，即代理对象
+          return enhancer.create();
+      }
+      // intercept()会调用目标对象的方法
+      @Override
+      public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+          System.out.println("Cglib代理模式开始");
+          Object invoke = method.invoke(target, args);
+          System.out.println("Cglib代理提交");
+          return invoke;
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //创建目标对象
+          TeacherDao teacherDao = new TeacherDao();
+          //获取代理对象，将目标对象传递给代理对象
+          ProxyFactory proxyFactory = new ProxyFactory(teacherDao);
+          TeacherDao proxyInstance = (TeacherDao)proxyFactory.getProxyInstance();
+          //执行代理对象的方法，触发intercept()方法从而实现对目标对象的调用
+          proxyInstance.teach();
+      }
+  }
+  ```
+
   
 
