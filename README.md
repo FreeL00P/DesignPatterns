@@ -1546,3 +1546,129 @@ public class Client {
 
   
 
+### 模板方法模式
+
+- 模板方法模式是一种设计模式，可以让程序员通过定义一些基本算法的步骤，来约束程序员在这些步骤上完成操作。这种模式既不会改变已有的算法步骤，也不会另外编写新的算法，只要在基本算法的步骤上进行扩展就可以了。常常用于处理需要按照一定步骤进行处理的问题。
+
+- 模板方法模式包含以下角色：
+
+  - 抽象模板（Abstract Template）类： 定义了模板方法和一些抽象方法，这些抽象方法由子类来实现。
+  - 具体模板（Concrete Template）类： 实现了抽象模板类中定义的抽象方法，完成模板方法中的各个步骤。
+  - 客户端（Client）类： 调用模板方法来完成具体的业务逻辑。
+
+- 模板方法模式优点：
+
+  1. 算法骨架是固定的，易于控制和管理；
+  2. 扩展性好，具体的实现可以在子类中定义；
+  3. 符合开闭原则，代码在使用过程中可以扩展，但不需要修改。
+
+- 模板方法模式缺点：
+
+  1. 模板方法中定义的步骤是固定的，不够灵活。
+  2. 如果具体实现类过多，会导致子类数量过于庞大，导致系统复杂度的提高。
+
+  抽象模板
+
+  ```java
+  public abstract class SoyaMilk {
+      //模板方法，make 模板方法可以做成final，不让子类去覆盖
+      final void make(){
+          select();
+          addCondiment();
+          soak();
+          beat();
+      }
+      //选材料
+      void select(){
+          System.out.println("1选好材料--新鲜黄豆");
+      }
+      //添加不同的配料，抽象方法
+      abstract void addCondiment();
+      //浸泡
+      void soak(){
+          System.out.println("3黄豆和材料开始浸泡");
+      }
+      void beat(){
+          System.out.println("4黄豆和配料放入豆浆机");
+      }
+  }
+  ```
+
+  具体模板
+
+  ```java
+  public class RedBeanSoyamilk extends SoyaMilk {
+      @Override
+      void addCondiment() {
+          System.out.println("加入上好的红豆");
+      }
+  }
+  public class PeanutSoyaMilk extends SoyaMilk{
+      @Override
+      void addCondiment() {
+          System.out.println("加入上好的花生");
+      }
+  }
+  ```
+
+  客户端
+
+  ```java
+  public class Client {
+      public static void main(String[] args) {
+          //制作红豆豆浆
+          SoyaMilk redBeanSoyamilk = new RedBeanSoyamilk();
+          redBeanSoyamilk.make();
+          System.out.println("=====");
+          SoyaMilk peanutSoyaMilk = new PeanutSoyaMilk();
+          peanutSoyaMilk.make();
+      }
+  }
+  ```
+
+- 也可以引入钩子函数，它默认不做任何事情，子类可以视情况要不要覆盖
+
+  ```java
+  public abstract class SoyaMilk {
+      //模板方法，make 模板方法可以做成final，不让子类去覆盖
+      final void make(){
+          select();
+          if(customWant()){
+              addCondiment();
+          }
+          soak();
+          beat();
+      }
+      //选材料
+      void select(){
+          System.out.println("1选好材料--新鲜黄豆");
+      }
+      //添加不同的配料，抽象方法
+      abstract void addCondiment();
+      //浸泡
+      void soak(){
+          System.out.println("3黄豆和材料开始浸泡");
+      }
+      void beat(){
+          System.out.println("4黄豆和配料放入豆浆机");
+      }
+      //钩子方法，决定是否需要添加配料
+      boolean customWant(){
+          return true;
+      }
+  }
+  public class PureSoyaMilk extends SoyaMilk{
+  
+      @Override
+      void addCondiment() {
+          //空实现
+      }
+      //不需要配料 实现钩子方法
+      @Override
+      boolean customWant() {
+          return false;
+      }
+  }
+  ```
+
+  
