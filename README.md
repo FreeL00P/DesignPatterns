@@ -1360,4 +1360,129 @@ public class Client {
   webSiteCount = 1
   ```
 
+
+### 代理模式
+
+#### 静态代理模式
+
+- 静态代理是指定义一个代理类去代理一个真实类，使得调用者在使用时无需知道真实类的存在，代理类会在调用真实类方法前后加上一些额外的逻辑处理。
+
+- 静态代理需要针对每个被代理类单独写一个代理类，即使代理逻辑相同，每次都需要重复写代理类，不利于维护和扩展。
+
+- 例如，假设有一个接口 IUserService，定义了一个方法 saveUser，真实类 UserServiceImpl 实现了该接口，我们可以定义一个代理类 UserServiceProxy 去代理 UserServiceImpl，并在代理类中加上一些额外的逻辑，如记录日志、检验参数等，代码如下：
+
+  ```java
+  public interface IUserService {
+      void saveUser(String name, String pwd);
+  }
   
+  public class UserServiceImpl implements IUserService{
+      @Override
+      public void saveUser(String name, String pwd) {
+          // 真正的业务逻辑
+      }
+  }
+  
+  public class UserServiceProxy implements IUserService{
+      private IUserService userService;
+   
+      public UserServiceProxy(IUserService userService){
+          this.userService = userService;
+      }
+   
+      @Override
+      public void saveUser(String name, String pwd) {
+          System.out.println("保存用户前检验参数...");
+          userService.saveUser(name, pwd);
+          System.out.println("保存用户后记录日志...");
+      }
+  }
+  ```
+
+  使用时，我们先创建真实类 UserServiceImpl 的实例，再创建代理类 UserServiceProxy 的实例，将真实类实例传入代理类构造方法中，最后调用代理类的 saveUser 方法，代码如下：
+
+  ```java
+  IUserService userServiceImpl = new UserServiceImpl();
+  IUserService userServiceProxy = new UserServiceProxy(userServiceImpl);
+  userServiceProxy.saveUser("Tom", "123456");
+  
+  ```
+
+  输出：
+
+  ```java
+  保存用户前检验参数...
+  保存用户...
+  保存用户后记录日志...
+  ```
+
+  可以看到，调用代理类的 saveUser 方法时，代理类会在调用真实类方法前后加上一些额外的逻辑处理，达到了代理的目的。
+
+#### JDK动态代理
+
+- 相比较于静态代理需要手动编写代理类，JDK动态代理可以在运行时动态生成代理类，不需要手写代理类。JDK动态代理需要有一个接口来声明代理类，所以只能代理有接口的真实类，不能代理没有接口的类。
+
+- JDK动态代理的核心类是 java.lang.reflect.Proxy，它提供了一个静态工厂方法 newProxyInstance，用来创建代理类对象。newProxyInstance 方法需要传入三个参数，分别为：类加载器、代理类需要实现的接口数组、指定的 InvocationHandler 对象。
+
+- InvocationHandler 接口中只有一个方法 invoke，该方法会在代理类调用任意方法时被回调，我们可以在该方法中对真实类方法的调用进行拦截和增强处理。
+
+  ```java
+  public interface ITeacherDao {
+      void teach();
+  }
+  public class TeacherDao implements ITeacherDao{
+      @Override
+      public void teach() {
+          System.out.println("老师正在授课中......");
+      }
+  }
+  public class ProxyFactory {
+      //维护一个目标对象，Object
+      private Object target;
+      //通过构造器传入目标对象，初始化
+      public ProxyFactory(Object target) {
+          this.target = target;
+      }
+      //给目标对象生成一个代理对象
+      public Object getProxyInstance(){
+          /**
+           * public static Object newProxyInstance(ClassLoader loader,
+           *                 Class<?>[] interfaces,
+           *                 InvocationHandler h)
+           * 1 ClassLoader loader:指当前目标对象使用的类加载器，获取加载器的方法固定
+           * 2 Class<>() interface:目标对象实现的接口，使用泛型方法确认实现
+           * 3 InvocationHandler h:事件处理器，执行目标方法时，会触发事情处理器方法
+           * 会把当前执行的目标对象方法作为一个参数传入
+           */
+          return Proxy.newProxyInstance(target.getClass().getClassLoader(),
+                  target.getClass().getInterfaces(), new InvocationHandler() {
+                      @Override
+                      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                          System.out.println("==>JDK代理<==");
+                          //反射调用目标对象的方法
+                          return method.invoke(target, args);
+                      }
+                  });
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //创建目标对象
+          ITeacherDao teacherDao = new TeacherDao();
+          //给目标对象创建代理对象
+          ProxyFactory proxyFactory = new ProxyFactory(teacherDao);
+          ITeacherDao proxyInstance = (ITeacherDao)proxyFactory.getProxyInstance();
+          proxyInstance.teach();
+      }
+  }
+  ```
+
+  输出结果
+
+  ```text
+  ==>JDK代理<==
+  老师正在授课中......
+  ```
+
+  
+
