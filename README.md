@@ -1671,4 +1671,155 @@ public class Client {
   }
   ```
 
-  
+
+### 命令模式
+
+- 命令模式是一种行为型设计模式，它将一个请求封装为一个对象，使得请求的发送者和接收者分别独立，且可随时增加新的请求。该模式分为四个角色：抽象命令、具体命令、调用者和接收者。抽象命令类定义了一个抽象的接口，具体命令类实现了抽象命令，并封装了一个或多个接收者，调用者负责调用具体命令来执行请求。
+
+- 命令模式优点：
+  1. 解耦请求的发送者和接收者，降低了耦合度；
+  2. 可以轻松添加新的命令，符合开闭原则；
+  3. 可以将命令排队，实现请求的批处理、撤销和重做等操作。
+
+- 命令模式缺点：
+  1. 每个具体命令类都需要定义一个接收者，导致类的数量增加；
+  2. 命令的执行时间和执行顺序不易控制。
+
+- 应用场景：
+  1. 系统需要将请求调用者和请求接收者解耦，使得调用者和接收者不直接交互；
+  2. 系统需要支持命令的撤销(Undo)和恢复(Redo)操作；
+  3. 系统需要支持命令的排队、记录日志、多次执行等功能。
+
+- 例如，电灯遥控器使用了命令模式。用户按下遥控器上的按钮时，遥控器会发送一个对应的命令到电灯控制器，控制器会将命令封装为一个对象，并将其送到电灯上执行。这样，在每个命令对象中，封装了具体的操作和接受者对象，从而实现了请求发送者和接收者之间的解耦。
+
+```java
+//创建命令接口
+public interface Command {
+    //执行操作
+    void execute();
+    //撤销操作
+    void undo();
+}
+public class LightOffCommand implements Command {
+    //聚合 LightReceiver
+    LightReceiver light;
+
+    public LightOffCommand(LightReceiver light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        //调用接收者方法
+        light.off();
+    }
+
+    @Override
+    public void undo() {
+        light.on();
+    }
+}
+public class LightOnCommand implements Command{
+    //聚合 LightReceiver
+    LightReceiver light;
+
+    public LightOnCommand(LightReceiver light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        //调用接收者方法
+        light.on();
+    }
+
+    @Override
+    public void undo() {
+        light.off();
+    }
+}
+//空执行 用于初始化每个按钮，当调用空命令时，对象什么都不做，
+// 这也是一种设计模式，可以省掉对空的判断
+public class NoCommand implements Command{
+    @Override
+    public void execute() {
+
+    }
+
+    @Override
+    public void undo() {
+
+    }
+}
+//命令执行对象（接收者）
+public class LightReceiver {
+    public void on(){
+        System.out.println("电灯打开了");
+    }
+    public void off(){
+        System.out.println("电灯关闭了");
+    }
+}
+public class RemoteController {
+    //开按钮的命令数组
+    Command[] onCommands;
+    //关按钮的命令数组
+    Command[] offCommands;
+    //执行撤销的命令
+    Command undoCommand;
+
+    public RemoteController() {
+        onCommands=new Command[5];
+        offCommands=new Command[5];
+        for (int i = 0; i < 5; i++) {
+            //使用空命令进行初始化
+            onCommands[i] = new NoCommand();
+            offCommands[i] = new NoCommand();
+        }
+    }
+    //给我们的按钮设置需要的命令
+    public void setCommands(int no,Command onCommand,Command offCommand){
+        onCommands[no]=onCommand;
+        offCommands[no]=offCommand;
+    }
+    //按下开的按钮
+    public void onButtonWasPushed(int no){
+        //找到你按开的按钮，调用对应方法
+        onCommands[no].execute();
+        //记录本次操作，用于撤销
+        undoCommand=onCommands[no];
+    }
+    //按下关的按钮
+    public void offButtonWasPushed(int no){
+        //找到你按开的按钮，调用对应方法
+        offCommands[no].execute();
+        //记录本次操作，用于撤销
+        undoCommand=offCommands[no];
+    }
+    //按下撤销的按钮
+    public void undoButtonWasPushed(int no){
+      undoCommand.undo();
+    }
+}
+public class Client {
+    public static void main(String[] args) {
+        //使用命令设计模式，完成通过遥控器对电灯的操作
+        //创建电灯的对象（接收者）
+        LightReceiver lightReceiver = new LightReceiver();
+        //创建电灯相关的开关命令
+        LightOnCommand lightOnCommand = new LightOnCommand(lightReceiver);
+        LightOffCommand lightOffCommand = new LightOffCommand(lightReceiver);
+        //需要一个遥控器
+        RemoteController remoteController = new RemoteController();
+        //给遥控器设置相关命令，比如no=0是电灯的开和关操作
+        remoteController.setCommands(0,lightOnCommand,lightOffCommand);
+        //按下开灯
+        remoteController.onButtonWasPushed(0);
+        //按下关灯
+        remoteController.offButtonWasPushed(0);
+        //按下撤销
+        remoteController.undoButtonWasPushed(0);
+    }
+}
+```
+
