@@ -1692,134 +1692,291 @@ public class Client {
 
 - 例如，电灯遥控器使用了命令模式。用户按下遥控器上的按钮时，遥控器会发送一个对应的命令到电灯控制器，控制器会将命令封装为一个对象，并将其送到电灯上执行。这样，在每个命令对象中，封装了具体的操作和接受者对象，从而实现了请求发送者和接收者之间的解耦。
 
-```java
-//创建命令接口
-public interface Command {
-    //执行操作
-    void execute();
-    //撤销操作
-    void undo();
-}
-public class LightOffCommand implements Command {
-    //聚合 LightReceiver
-    LightReceiver light;
+  ```java
+  //创建命令接口
+  public interface Command {
+      //执行操作
+      void execute();
+      //撤销操作
+      void undo();
+  }
+  public class LightOffCommand implements Command {
+      //聚合 LightReceiver
+      LightReceiver light;
+  
+      public LightOffCommand(LightReceiver light) {
+          this.light = light;
+      }
+  
+      @Override
+      public void execute() {
+          //调用接收者方法
+          light.off();
+      }
+  
+      @Override
+      public void undo() {
+          light.on();
+      }
+  }
+  public class LightOnCommand implements Command{
+      //聚合 LightReceiver
+      LightReceiver light;
+  
+      public LightOnCommand(LightReceiver light) {
+          this.light = light;
+      }
+  
+      @Override
+      public void execute() {
+          //调用接收者方法
+          light.on();
+      }
+  
+      @Override
+      public void undo() {
+          light.off();
+      }
+  }
+  //空执行 用于初始化每个按钮，当调用空命令时，对象什么都不做，
+  // 这也是一种设计模式，可以省掉对空的判断
+  public class NoCommand implements Command{
+      @Override
+      public void execute() {
+  
+      }
+  
+      @Override
+      public void undo() {
+  
+      }
+  }
+  //命令执行对象（接收者）
+  public class LightReceiver {
+      public void on(){
+          System.out.println("电灯打开了");
+      }
+      public void off(){
+          System.out.println("电灯关闭了");
+      }
+  }
+  public class RemoteController {
+      //开按钮的命令数组
+      Command[] onCommands;
+      //关按钮的命令数组
+      Command[] offCommands;
+      //执行撤销的命令
+      Command undoCommand;
+  
+      public RemoteController() {
+          onCommands=new Command[5];
+          offCommands=new Command[5];
+          for (int i = 0; i < 5; i++) {
+              //使用空命令进行初始化
+              onCommands[i] = new NoCommand();
+              offCommands[i] = new NoCommand();
+          }
+      }
+      //给我们的按钮设置需要的命令
+      public void setCommands(int no,Command onCommand,Command offCommand){
+          onCommands[no]=onCommand;
+          offCommands[no]=offCommand;
+      }
+      //按下开的按钮
+      public void onButtonWasPushed(int no){
+          //找到你按开的按钮，调用对应方法
+          onCommands[no].execute();
+          //记录本次操作，用于撤销
+          undoCommand=onCommands[no];
+      }
+      //按下关的按钮
+      public void offButtonWasPushed(int no){
+          //找到你按开的按钮，调用对应方法
+          offCommands[no].execute();
+          //记录本次操作，用于撤销
+          undoCommand=offCommands[no];
+      }
+      //按下撤销的按钮
+      public void undoButtonWasPushed(int no){
+        undoCommand.undo();
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //使用命令设计模式，完成通过遥控器对电灯的操作
+          //创建电灯的对象（接收者）
+          LightReceiver lightReceiver = new LightReceiver();
+          //创建电灯相关的开关命令
+          LightOnCommand lightOnCommand = new LightOnCommand(lightReceiver);
+          LightOffCommand lightOffCommand = new LightOffCommand(lightReceiver);
+          //需要一个遥控器
+          RemoteController remoteController = new RemoteController();
+          //给遥控器设置相关命令，比如no=0是电灯的开和关操作
+          remoteController.setCommands(0,lightOnCommand,lightOffCommand);
+          //按下开灯
+          remoteController.onButtonWasPushed(0);
+          //按下关灯
+          remoteController.offButtonWasPushed(0);
+          //按下撤销
+          remoteController.undoButtonWasPushed(0);
+      }
+  }
+  ```
 
-    public LightOffCommand(LightReceiver light) {
-        this.light = light;
-    }
+### 访问者模式
 
-    @Override
-    public void execute() {
-        //调用接收者方法
-        light.off();
-    }
+- 访问者模式是在一个程序中对于某个特定的数据结构中的所有元素进行操作，而这些操作可以被独立地改变而不需要改变这些元素的类。简单来说，就是把操作和数据分离，让操作可以独立地变化。在该模式中，数据结构提供一个接受访问者对象的方法，让访问者来处理数据结构中的元素。而访问者则会针对不同类型的元素，执行不同的操作。这样可以方便地增加新的操作，而不用修改已有的类。
+- 组成
+  - Element：元素抽象类，定义了一个接受访问者的方法accept，这个方法接收一个访问者作为参数，让访问者处理这个元素。
+  - Visitor：访问者抽象类，定义了一系列访问ConcreteElementA和ConcreteElementB的方法。这些方法参数中都包含了具体的元素对象，这样访问者就可以针对不同的元素对象做出不同的操作。
+  - 在实际的实现中，可能还会有一个ObjectStructure类来存储所有的元素对象，Visitor对象则在访问ObjectStructure的过程中，对其中的元素对象进行处理。但这并不是访问者模式的必要组成部分，可以根据实际情况来决定是否需要添加。
 
-    @Override
-    public void undo() {
-        light.on();
-    }
-}
-public class LightOnCommand implements Command{
-    //聚合 LightReceiver
-    LightReceiver light;
+访问者模式的优点：
 
-    public LightOnCommand(LightReceiver light) {
-        this.light = light;
-    }
+- 增加新的操作方法很容易，只需要实现一个新的访问者即可，不需要修改元素类或已有的访问者。
+- 将数据结构和处理逻辑分离开来，符合单一职责原则。
+- 可以对原有的数据结构进行访问控制，只允许访问者访问特定的元素。
 
-    @Override
-    public void execute() {
-        //调用接收者方法
-        light.on();
-    }
+访问者模式的缺点：
 
-    @Override
-    public void undo() {
-        light.off();
-    }
-}
-//空执行 用于初始化每个按钮，当调用空命令时，对象什么都不做，
-// 这也是一种设计模式，可以省掉对空的判断
-public class NoCommand implements Command{
-    @Override
-    public void execute() {
+- 增加新元素类型很困难，需要在所有访问者中添加相应的处理方法。
 
-    }
+- 增加新的访问者会导致访问者类的数量增加，系统更加复杂。
 
-    @Override
-    public void undo() {
+- 访问者访问元素时，它们之间的关系是没有封装的，这可能会导致元素被破坏。
 
-    }
-}
-//命令执行对象（接收者）
-public class LightReceiver {
-    public void on(){
-        System.out.println("电灯打开了");
-    }
-    public void off(){
-        System.out.println("电灯关闭了");
-    }
-}
-public class RemoteController {
-    //开按钮的命令数组
-    Command[] onCommands;
-    //关按钮的命令数组
-    Command[] offCommands;
-    //执行撤销的命令
-    Command undoCommand;
+  ```java
+  //元素抽象类
+  public abstract class Person {
+      //通过一个方法让访问者可以访问
+      public abstract void accept(Action action);
+  
+  }
+  public class Man extends Person{
+      @Override
+      public void accept(Action action) {
+          action.getManResult(this);
+      }
+  }
+  //这里我们使用到了双分派，即首先在客户端程序中，
+  // 将具体的状态作为参数传递到了Woman中完成了一次分派
+  // 然后Woman这个类里面调用了作为参数的具体方法中的方法getWomanResult
+  //同时将自己this作为参数传入，2完成第二次的分派
+  public class Woman extends Person{
+      @Override
+      //接受action
+      public void accept(Action action) {
+          //把自己传进去
+          action.getWomanResult(this);
+      }
+  }
+  ```
 
-    public RemoteController() {
-        onCommands=new Command[5];
-        offCommands=new Command[5];
-        for (int i = 0; i < 5; i++) {
-            //使用空命令进行初始化
-            onCommands[i] = new NoCommand();
-            offCommands[i] = new NoCommand();
-        }
-    }
-    //给我们的按钮设置需要的命令
-    public void setCommands(int no,Command onCommand,Command offCommand){
-        onCommands[no]=onCommand;
-        offCommands[no]=offCommand;
-    }
-    //按下开的按钮
-    public void onButtonWasPushed(int no){
-        //找到你按开的按钮，调用对应方法
-        onCommands[no].execute();
-        //记录本次操作，用于撤销
-        undoCommand=onCommands[no];
-    }
-    //按下关的按钮
-    public void offButtonWasPushed(int no){
-        //找到你按开的按钮，调用对应方法
-        offCommands[no].execute();
-        //记录本次操作，用于撤销
-        undoCommand=offCommands[no];
-    }
-    //按下撤销的按钮
-    public void undoButtonWasPushed(int no){
-      undoCommand.undo();
-    }
-}
-public class Client {
-    public static void main(String[] args) {
-        //使用命令设计模式，完成通过遥控器对电灯的操作
-        //创建电灯的对象（接收者）
-        LightReceiver lightReceiver = new LightReceiver();
-        //创建电灯相关的开关命令
-        LightOnCommand lightOnCommand = new LightOnCommand(lightReceiver);
-        LightOffCommand lightOffCommand = new LightOffCommand(lightReceiver);
-        //需要一个遥控器
-        RemoteController remoteController = new RemoteController();
-        //给遥控器设置相关命令，比如no=0是电灯的开和关操作
-        remoteController.setCommands(0,lightOnCommand,lightOffCommand);
-        //按下开灯
-        remoteController.onButtonWasPushed(0);
-        //按下关灯
-        remoteController.offButtonWasPushed(0);
-        //按下撤销
-        remoteController.undoButtonWasPushed(0);
-    }
-}
-```
+  访问抽象类
 
+  ```java
+  public abstract class Action {
+      //得到男性的测评结果
+      public abstract void getManResult(Man man);
+      //得到女性的测评结果
+      public abstract void getWomanResult(Woman man);
+  }
+  public class Fail extends Action{
+      @Override
+      public void getManResult(Man man) {
+          System.out.println("男人给的评价是该回家了");
+      }
+  
+      @Override
+      public void getWomanResult(Woman man) {
+          System.out.println("女人给的评价是该回家了");
+      }
+  }
+  public class Success extends Action{
+      @Override
+      public void getManResult(Man man) {
+          System.out.println("男人给的评价是成功");
+      }
+  
+      @Override
+      public void getWomanResult(Woman man) {
+          System.out.println("女人给的评价是很成功");
+      }
+  }
+  public class Wait extends Action{
+      @Override
+      public void getManResult(Man man) {
+          System.out.println("男人表示回家等消息");
+      }
+  
+      @Override
+      public void getWomanResult(Woman man) {
+          System.out.println("女人表示回家等消息");
+      }
+  }
+  ```
+
+  数据结构
+
+  ```java
+  //数据结构，管理很多人
+  public class ObjectStructure {
+      //维护一个集合
+      private  List<Person> persons=new LinkedList<>();
+      //增加到list
+      public void attach(Person person) {
+          persons.add(person);
+      }
+      //移除
+      public void detach(Person person) {
+          persons.remove(person);
+      }
+      //显示测评情况
+      public void display(Action action){
+          for (Person person : persons) {
+              person.accept(action);
+          }
+      }
+  }
+  ```
+
+  客户端
+
+  ```java
+  public class Client {
+      public static void main(String[] args) {
+          //创建ObjectStructure
+          ObjectStructure objectStructure = new ObjectStructure();
+          objectStructure.attach(new Man());
+          Fail fail = new Fail();
+          //查看当前结果
+          objectStructure.display(fail);
+  
+          System.out.println("<==>");
+          objectStructure.attach(new Man());
+          Success success = new Success();
+          objectStructure.display(success);
+          System.out.println("<==>");
+          Wait wait = new Wait();
+          objectStructure.attach(new Woman());
+          objectStructure.display(wait);
+      }
+  }
+  ```
+
+  执行结果
+
+  ```java
+  男人给的评价是该回家了
+  <==>
+  男人给的评价是成功
+  男人给的评价是成功
+  <==>
+  男人表示回家等消息
+  男人表示回家等消息
+  女人表示回家等消息
+  ```
+
+  
+
+  
