@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.freeloop.command</OriginalElement>
+  <nodes>
+    <node x="423.25961538461536" y="469.0">com.freeloop.command.Client</node>
+    <node x="248.0" y="293.0">com.freeloop.command.LightOnCommand</node>
+    <node x="514.0" y="293.0">com.freeloop.command.LightOffCommand</node>
+    <node x="628.051282051282" y="115.0">com.freeloop.command.LightReceiver</node>
+    <node x="-17.75" y="-14.0">com.freeloop.command.Command</node>
+    <node x="-91.0" y="270.0">com.freeloop.command.RemoteController</node>
+    <node x="46.80128205128199" y="115.0">com.freeloop.command.NoCommand</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.freeloop.command.RemoteController" target="com.freeloop.command.Command" relationship="TO_MANY">
+      <point x="-79.75" y="-73.5" />
+      <point x="-11.25" y="248.0" />
+      <point x="25.301282051281987" y="248.0" />
+      <point x="25.301282051281987" y="94.0" />
+      <point x="4.25" y="94.0" />
+      <point x="-44.0" y="38.5" />
+    </edge>
+    <edge source="com.freeloop.command.LightOnCommand" target="com.freeloop.command.Command" relationship="REALIZATION">
+      <point x="-61.5" y="-50.5" />
+      <point x="309.5" y="248.0" />
+      <point x="365.551282051282" y="248.0" />
+      <point x="366.29166666666663" y="84.0" />
+      <point x="92.25" y="84.0" />
+      <point x="44.0" y="38.5" />
+    </edge>
+    <edge source="com.freeloop.command.Client" target="com.freeloop.command.LightReceiver" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="503.25961538461536" y="443.0" />
+      <point x="770.5" y="443.0" />
+      <point x="770.5" y="248.0" />
+      <point x="737.551282051282" y="248.0" />
+      <point x="36.5" y="50.5" />
+    </edge>
+    <edge source="com.freeloop.command.LightOffCommand" target="com.freeloop.command.LightReceiver" relationship="TO_ONE">
+      <point x="61.5" y="-50.5" />
+      <point x="698.5" y="248.0" />
+      <point x="665.051282051282" y="248.0" />
+      <point x="-36.5" y="50.5" />
+    </edge>
+    <edge source="com.freeloop.command.Client" target="com.freeloop.command.LightOffCommand" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="503.25961538461536" y="443.0" />
+      <point x="637.0" y="443.0" />
+      <point x="0.0" y="50.5" />
+    </edge>
+    <edge source="com.freeloop.command.RemoteController" target="com.freeloop.command.NoCommand" relationship="CREATE">
+      <point x="79.75" y="-73.5" />
+      <point x="148.25" y="248.0" />
+      <point x="78.55128205128199" y="248.0" />
+      <point x="78.55128205128199" y="238.0" />
+      <point x="120.80128205128199" y="238.0" />
+      <point x="0.0" y="50.5" />
+    </edge>
+    <edge source="com.freeloop.command.Client" target="com.freeloop.command.LightOnCommand" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="503.25961538461536" y="443.0" />
+      <point x="371.0" y="443.0" />
+      <point x="0.0" y="50.5" />
+    </edge>
+    <edge source="com.freeloop.command.RemoteController" target="com.freeloop.command.Command" relationship="CREATE">
+      <point x="79.75" y="-73.5" />
+      <point x="148.25" y="248.0" />
+      <point x="78.55128205128199" y="248.0" />
+      <point x="78.55128205128199" y="238.0" />
+      <point x="36.30128205128199" y="238.0" />
+      <point x="36.30128205128199" y="94.0" />
+      <point x="48.25" y="94.0" />
+      <point x="0.0" y="38.5" />
+    </edge>
+    <edge source="com.freeloop.command.NoCommand" target="com.freeloop.command.Command" relationship="REALIZATION">
+      <point x="0.0" y="-50.5" />
+      <point x="120.80128205128199" y="94.0" />
+      <point x="366.29166666666663" y="94.0" />
+      <point x="366.29166666666663" y="84.0" />
+      <point x="92.25" y="84.0" />
+      <point x="44.0" y="38.5" />
+    </edge>
+    <edge source="com.freeloop.command.LightOffCommand" target="com.freeloop.command.Command" relationship="REALIZATION">
+      <point x="-61.5" y="-50.5" />
+      <point x="575.5" y="238.0" />
+      <point x="499.0" y="238.0" />
+      <point x="499.0" y="94.0" />
+      <point x="366.29166666666663" y="94.0" />
+      <point x="366.29166666666663" y="84.0" />
+      <point x="92.25" y="84.0" />
+      <point x="44.0" y="38.5" />
+    </edge>
+    <edge source="com.freeloop.command.Client" target="com.freeloop.command.RemoteController" relationship="CREATE">
+      <point x="0.0" y="-39.0" />
+      <point x="503.25961538461536" y="443.0" />
+      <point x="68.5" y="443.0" />
+      <point x="0.0" y="73.5" />
+    </edge>
+    <edge source="com.freeloop.command.LightOnCommand" target="com.freeloop.command.LightReceiver" relationship="TO_ONE">
+      <point x="61.5" y="-50.5" />
+      <point x="432.5" y="248.0" />
+      <point x="665.051282051282" y="248.0" />
+      <point x="-36.5" y="50.5" />
+    </edge>
+  </edges>
+  <settings layout="分层" zoom="1.1824440619621341" showDependencies="true" x="351.99999999999994" y="333.8136826783115" />
+  <SelectedNodes />
+  <Categories>
+    <Category>字段</Category>
+    <Category>属性</Category>
+    <Category>方法</Category>
+    <Category>构造函数</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
