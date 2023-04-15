@@ -2184,5 +2184,181 @@ public class Client {
 
   ![ComputerCollege](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/ComputerCollege.png)
 
+
+### 观察者模式
+
+- 让多个对象可以观察一个对象，并在该对象发生更改时获取通知并做出响应。类似于我们订阅了某个YouTube频道，每当该频道发布新视频时，我们就会收到通知并可以在时间合适的情况下观看视频。在观察者模式中，主要包含两种角色：观察者和被观察者。被观察者负责发布通知，同时也可以添加和删除观察者。观察者则负责接收通知，并在需要时做出响应。该模式可以帮助我们实现松耦合的代码架构，有效地提高代码的可扩展性和灵活性。
+
+- 观察者模式的优点
+
+  - 它可以将主题与观察者解耦，使得主题与观察者可以独立的变化。此外，观察者模式可以很容易的添加或删除观察者，而不需要修改主题的代码。
+
+- 观察者模式的缺点
+
+  - 当观察者太多时，通知所有观察者可能会导致性能问题。
+
+  ```java
+  //被观察者接口，需要让WeatherData实现
+  public interface Subject {
+      void registerObserver(Observer observer);
+      void removeObserver(Observer observer);
+      void notifyObservers();
+  }
+  ```
+
+  观察者接口
+
+  ```java
+  //观察者接口
+  public interface Observer {
+      /**
+       *
+       * @param temperature 温度
+       * @param pressure 气压
+       * @param humidity 湿度
+       */
+      void update(float temperature,float pressure,float humidity);
+  
+  }
+  ```
+
+  实现类
+
+  ```java
+  /**
+   * WeatherData
+   * 包含最新的天气情况信息
+   * 含有观察者集合使用ArrayList管理
+   * 当有数据有更新时，就主动调用ArrayList， 通知所有的接入方就看到最新消息
+   * @author fj
+   * @since 2023/4/15 21:10
+   */
+  @Data
+  public class WeatherData implements Subject{
+      private float temperature;
+      private float pressure;
+      private float humidity;
+      //观察者集合
+      private ArrayList<Observer> observers;
+  
+      public WeatherData() {
+          observers = new ArrayList<Observer>();
+      }
+  
+      public void dataChange(){
+          //调用接入方的update
+          this.notifyObservers();
+      }
+      //当数据有更新时就调用setData
+      public void setData(float temperature,float pressure,float humidity){
+          this.temperature=temperature;
+          this.pressure=pressure;
+          this.humidity=humidity;
+          //调用dataChange将最新的消息推送给接入方currentConditions
+          dataChange();
+      }
+      //注册一个观察者
+      @Override
+      public void registerObserver(Observer observer) {
+          observers.add(observer);
+      }
+      //移除一个观察者
+      @Override
+      public void removeObserver(Observer observer) {
+          if (observers.contains(observer)) observers.remove(observer);
+      }
+      //遍历所有的观察者并通知
+      @Override
+      public void notifyObservers() {
+          for (Observer observer : observers){
+              observer.update(getTemperature(),getPressure(),getHumidity());
+          }
+      }
+  }
+  ```
+
+  具体观察者
+
+  ```java
+  //观察者
+  public class CurrentConditions implements  Observer{
+      private float temperature;
+      private float pressure;
+      private float humidity;
+      //更新天气情况由WeatherData 来调用，我使用推送模式
+      @Override
+      public void update(float temperature, float pressure, float humidity){
+          this.temperature = temperature;
+          this.pressure = pressure;
+          this.humidity = humidity;
+          display();
+      }
+      //显示
+      public void display(){
+          System.out.println("温度=>"+temperature);
+          System.out.println("压力=>"+pressure);
+          System.out.println("湿度=>"+humidity);
+      }
+  }
+  public class BaiduSite implements Observer{
+      private float temperature;
+      private float pressure;
+      private float humidity;
+      //更新天气情况由WeatherData 来调用，我使用推送模式
+      @Override
+      public void update(float temperature, float pressure, float humidity){
+          this.temperature = temperature;
+          this.pressure = pressure;
+          this.humidity = humidity;
+          display();
+      }
+      //显示
+      public void display(){
+          System.out.println("百度温度=>"+temperature);
+          System.out.println("百度压力=>"+pressure);
+          System.out.println("百度湿度=>"+humidity);
+      }
+  }
+  ```
+
+  客户端
+
+  ```java
+  public class Client {
+      public static void main(String[] args) {
+          //创建一个WeatherData
+          WeatherData weatherData = new WeatherData();
+          //创建观察者
+          CurrentConditions currentConditions = new CurrentConditions();
+          BaiduSite baiduSite = new BaiduSite();
+          weatherData.registerObserver(currentConditions);
+          weatherData.registerObserver(baiduSite);
+          //测试
+          System.out.println("通知各个注册的观察者");
+          weatherData.setData(10f,100f,30.3f);
+      }
+  }
+  ```
+
+  运行结果
+
+  ```text
+  通知各个注册的观察者
+  温度=>10.0
+  压力=>100.0
+  湿度=>30.3
+  百度温度=>10.0
+  百度压力=>100.0
+  百度湿度=>30.3
+  ```
+
+  类图
+
+  ![观察者模式](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F.png)
+
+  
+
+  
+
   
 
