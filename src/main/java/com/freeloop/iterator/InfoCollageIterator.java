@@ -35,6 +35,5 @@ public class InfoCollageIterator implements Iterator {
     //空实现remove
     @Override
     public void remove() {
-        Iterator.super.remove();
     }
 }

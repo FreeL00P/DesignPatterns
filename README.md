@@ -1981,4 +1981,208 @@ public class Client {
 
   ![image-20230414220916979](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/image-20230414220916979.png)
 
+
+### 迭代器模式
+
+- 迭代器模式（Iterator Pattern）是一种行为型设计模式，它提供了一种方法，可以顺序地访问一个聚合对象（如列表、树形结构等）中各个元素，而不必暴露该对象的内部表示。
+
+- 在迭代器模式中，一般有两个关键角色：迭代器和聚合对象。
+
+- 迭代器是一个遍历聚合对象的接口，具有 hasNext() 方法和 next() 方法。hasNext() 用于判断是否还有下一个元素，next() 用于取出下一个元素。
+
+- 聚合对象是一个类或接口，它具有一个或多个方法，可以返回一个实现了迭代器接口的对象。这个迭代器对象可以用来遍历聚合对象中的元素。
+
+- 迭代器模式的优点：
+
+  - 可以遍历不同类型的聚合对象，而无需知道其内部结构，使得遍历算法与聚合对象解耦。
+
+  - 简化了遍历过程，使得代码更加简洁，对于复杂聚合对象的遍历尤为有效。
+
+- 迭代器模式的缺点：
+
+  - 增加了新的聚合类和迭代器类，增加了系统的复杂度。
+
+  - 在遍历过程中，如果聚合对象发生了修改，可能会导致迭代器失效。
+
+- 迭代器模式适用于需要对聚合对象进行遍历操作的场景，例如需要对一个列表、树形结构、图形结构等数据结构进行遍历操作。迭代器模式可以将遍历算法和聚合对象分离开来，使得聚合对象可以进行任何修改，而不影响遍历算法。
+
+  ```java
+  @Data
+  @AllArgsConstructor
+  public class Department {
+      private String name;
+      private String description;
+  }
+  //学院
+  public interface College {
+      String getName();
+      //增加系的方法
+      void addDepartment(String name, String desc);
+      //返回一个迭代器遍历
+      Iterator createIterator();
+  }
+  ```
+
+  学院
+
+  ```java
+  public class ComputerCollege implements College{
+      Department[] departments;
+      int numOfDepartment=0;//保存当前数组的对象个数
   
+      public ComputerCollege() {
+          departments=new Department[5];
+          addDepartment("JAVA","咖啡");
+          addDepartment("Python","蟒蛇");
+          addDepartment("C","语言");
+      }
+  
+      @Override
+      public String getName() {
+          return "计算机学院";
+      }
+  
+      @Override
+      public void addDepartment(String name, String desc) {
+         departments[numOfDepartment]= new Department(name, desc);
+         numOfDepartment++;
+      }
+  
+      @Override
+      public Iterator createIterator() {
+          return new ComputerCollageIterator(departments);
+      }
+  }
+  public class InfoCollage implements College{
+      List<Department> departments;
+  
+      public InfoCollage() {
+          this.departments = new ArrayList<Department>();
+          this.addDepartment("信息安全","安全");
+          this.addDepartment("信息加密","加密");
+          this.addDepartment("信息盗取","开盒");
+      }
+  
+      @Override
+      public String getName() {
+          return "信息工程学院";
+      }
+  
+      @Override
+      public void addDepartment(String name, String desc) {
+          departments.add(new Department(name, desc));
+      }
+  
+      @Override
+      public Iterator createIterator() {
+          return new InfoCollageIterator(departments);
+      }
+  }
+  ```
+
+  迭代器
+
+  ```java
+  public class ComputerCollageIterator implements Iterator {
+      //这里我们需要Department是以怎样的方式存放
+      Department[] departments;
+      int position=0;//遍历的位置
+      @Override
+      public boolean hasNext() {
+          //判断是否还有下一个元素
+          return position < departments.length && departments[position] != null;
+      }
+  
+      @Override
+      public Object next() {
+          return departments[position++];
+      }
+      //删除的方法默认空实现
+      @Override
+      public void remove() {
+  
+      }
+      public  ComputerCollageIterator(Department[] departments) {
+          this.departments = departments;
+      }
+  }
+  public class InfoCollageIterator implements Iterator {
+      //信息工程学院是以list存放系的
+      List<Department> departments ;
+      int index=-1;
+      public InfoCollageIterator(List<Department> departments) {
+          this.departments = departments;
+      }
+      //判断集合还有没有下一个元素
+      @Override
+      public boolean hasNext() {
+          if (index >=departments.size()-1) {
+              return false;
+          }else{
+              index++;
+              return true;
+          }
+      }
+  
+      @Override
+      public Object next() {
+          return departments.get(index);
+      }
+      //空实现remove
+      @Override
+      public void remove() {
+      }
+  }
+  ```
+
+  客户端
+
+  ```java
+  public class OutPutImpl {
+      //获取学院集合
+      List<College> collegeList;
+  
+      //需要一个构造器
+  
+      public OutPutImpl(List<College> collegeList) {
+          this.collegeList = collegeList;
+      }
+      //遍历所有的学院,输出各个学院的系
+      public void printCollage(){
+          //从collageList取出所有的学院 java中的list已经实现了Iterator接口
+          for (College college : collegeList) {
+              //取出一个学院
+              System.out.println("学院名称==>" + college.getName());
+              //取出学院的Iterator
+              Iterator collegeIterator = college.createIterator();
+              printDepartment(collegeIterator);
+          }
+      }
+      //输出，学院输出系
+      public void printDepartment(Iterator iterator){
+          while (iterator.hasNext()){
+              Department department=(Department) iterator.next();
+              System.out.println("系名称==>"+department.getName());
+          }
+      }
+  }
+  public class Client {
+      public static void main(String[] args) {
+          //创建学院
+          List<College> collegeList = new ArrayList<>();
+          ComputerCollege computerCollege = new ComputerCollege();
+          InfoCollage infoCollage = new InfoCollage();
+          collegeList.add(computerCollege);
+          collegeList.add(infoCollage);
+          OutPutImpl outPut = new OutPutImpl(collegeList);
+          outPut.printCollage();
+      }
+  }
+  ```
+
+  类图
+
+  ![ComputerCollege](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/ComputerCollege.png)
+
+  
+
