@@ -2356,9 +2356,169 @@ public class Client {
 
   ![观察者模式](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F.png)
 
+### 中介者模式
+
+- 中介者模式是一种行为型设计模式，其目的是通过提供一个中介对象来简化对象之间的通信。在这种模式中，各个对象之间不直接相互交互，而是通过中介对象来进行交互。这使得各个对象之间的关系更加松散，也更容易扩展和修改。
+
+- 中介者模式通常由一个中介对象和多个相关对象组成。中介者对象负责协调相关对象的交互，使它们能够有效地通信。当相关对象发生改变时，中介者对象可以将这些改变转发给其他相关对象，从而保持所有相关对象的状态一致性。
+
+- 中介者模式常用于复杂的系统，尤其是那些对象之间存在大量相互依赖关系的系统中。其优点包括减少对象之间的耦合、提高系统的可复用性和可维护性、代码复杂性降低等。
+
+  中介者接口
+
+  ```java
+  /**
+   * 定义了中介者接口，其中有一个sendMessage方法用于接收同事对象发送的消息，
+   * 并将消息传递给其他的同事对象。
+   */
+  // 中介者接口
+  public interface Mediator {
+      void sendMessage(String message, Colleague sender);
+  }
+  ```
+
+  中介者接口的实现
+
+  ```java
+  /**
+   * 实现了中介者接口，
+   * 其中保存了对所有同事对象的引用。
+   * 当有同事对象发送消息时，
+   * 根据消息的来源不同将消息传递给不同的同事对象。
+   */
+  // 具体中介者类
+  public class ConcreteMediator implements Mediator {
+      private ColleagueA colleagueA;
+      private ColleagueB colleagueB;
   
+      public void setColleagueA(ColleagueA colleagueA) {
+          this.colleagueA = colleagueA;
+      }
+  
+      public void setColleagueB(ColleagueB colleagueB) {
+          this.colleagueB = colleagueB;
+      }
+  
+      @Override
+      public void sendMessage(String message, Colleague sender) {
+          if (sender == colleagueA) {
+              colleagueB.receiveMessage(message);
+          } else {
+              colleagueA.receiveMessage(message);
+          }
+      }
+  }
+  ```
+
+  同事抽象类
+
+  ```java
+  /**
+   * 定义了抽象同事类，
+   * 其中保存了对中介者对象的引用，
+   * 并声明了两个抽象方法：sendMessage和receiveMessage。
+   */
+  // 抽象同事类
+  public abstract class Colleague {
+      protected Mediator mediator;
+  
+      public Colleague(Mediator mediator) {
+          this.mediator = mediator;
+      }
+  
+      public abstract void sendMessage(String message);
+  
+      public abstract void receiveMessage(String message);
+  }
+  ```
+
+  同事抽象类的实现
+
+  ```java
+  /**
+   * 具体实现了同事类A，
+   * 实现了sendMessage方法并在其中通过中介者对象将消息发送给其他的同事对象。
+   * 同时，实现了receiveMessage方法，用于接收其他同事对象的消息。
+   */
+  // 具体同事类A
+  public class ColleagueA extends Colleague {
+      public ColleagueA(Mediator mediator) {
+          super(mediator);
+      }
+  
+      @Override
+      public void sendMessage(String message) {
+          mediator.sendMessage(message, this);
+      }
+  
+      @Override
+      public void receiveMessage(String message) {
+          System.out.println("ColleagueA received message: " + message);
+      }
+  }
+  public class ColleagueB extends Colleague {
+      public ColleagueB(Mediator mediator) {
+          super(mediator);
+      }
+  
+      @Override
+      public void sendMessage(String message) {
+          mediator.sendMessage(message, this);
+      }
+  
+      @Override
+      public void receiveMessage(String message) {
+          System.out.println("ColleagueB received message: " + message);
+      }
+  }
+  ```
+
+  客户端
+
+  ```java
+  public class Client {
+      public static void main(String[] args) {
+          ConcreteMediator mediator = new ConcreteMediator();
+  
+          ColleagueA colleagueA = new ColleagueA(mediator);
+          ColleagueB colleagueB = new ColleagueB(mediator);
+  
+          mediator.setColleagueA(colleagueA);
+          mediator.setColleagueB(colleagueB);
+  
+          colleagueA.sendMessage("Hello colleagueB!");
+  
+          colleagueB.sendMessage("Hi colleagueA!");
+      }
+  }
+  ```
+
+  在客户端代码中，创建了一个具体中介者对象和两个具体同事对象，并将它们注册到中介者对象中。然后，两个具体同事对象分别向对方发送消息。运行这段代码，我们会看到如下的输出结果：
+
+  ```text
+  ColleagueB received message: Hello colleagueB!
+  ColleagueA received message: Hi colleagueA!
+  ```
+
+  说明同事对象之间通过中介者对象成功地进行了通信。
+
+  类图
+
+  ![ConcreteMediator](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/ConcreteMediator.png)
+
+  优点：
+
+  1. 减少了对象之间的紧密耦合关系，增强了灵活性和可维护性。
+  2. 通过引入中介者对象，简化了对象之间的交互流程，降低了系统的复杂度。
+  3. 可以使对象之间的关系更加松散，有助于在系统中更好地进行分布式开发。
+  4. 可以降低系统的耦合度，使得系统更加易于修改和扩展。
+
+  缺点：
+
+  1. 引入中介者对象会增加系统的复杂度，使得系统的整体结构更加抽象化。
+  2. 中介者对象会集中承载系统的交互逻辑，可能会成为系统的瓶颈。
+  3. 在某些情况下，中介者对象可能会过度膨胀，变得庞大且难以维护。
+
+  总之，中介者模式适合于系统中对象之间的交互复杂度较高、相互之间关系紧密、耦合度较大的情况。如果系统的交互复杂度较低，或者对象之间的交互关系较为简单，中介者模式可能就过于复杂了，不适合使用。
 
   
-
-  
-
