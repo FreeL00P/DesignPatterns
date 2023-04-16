@@ -2521,4 +2521,107 @@ public class Client {
 
   总之，中介者模式适合于系统中对象之间的交互复杂度较高、相互之间关系紧密、耦合度较大的情况。如果系统的交互复杂度较低，或者对象之间的交互关系较为简单，中介者模式可能就过于复杂了，不适合使用。
 
+
+### 备忘录模式
+
+- 备忘录模式是一种行为型模式，它允许在不破坏对象封装的前提下捕获并保存其内部状态，并在需要时进行恢复。它由三个核心组件组成：备忘录、发起人和管理者。
+
+  - 备忘录（Memento）：负责存储发起人的内部状态。
+
+  - 发起人（Originator）：负责创建备忘录，并将其内部状态保存到备忘录中。
+
+  - 管理者（Caretaker）：负责存储和管理备忘录。
+
+- 备忘录模式的主要思想是：
+  - 将要保存的对象的状态封装成备忘录对象，由发起人创建备忘录对象并将其存储在管理者中，当需要恢复对象状态时，由管理者返回备忘录对象并让发起人将其内部状态恢复为备忘录中存储的状态。这样可以避免直接操作对象导致的封装破坏，同时也可以将对象的状态保存到磁盘或数据库等外部存储器中。
+
+- 优点：
+
+  - 它可以使对象状态的保存和恢复更加灵活、简单和安全，同时可以避免在对象外部直接访问其内部状态造成的封装破坏。
+
+- 缺点：
+
+  - 它可能会对系统的性能产生影响，尤其是在备忘录对象较多、备忘录对象较大时。
+
+  ```java
+  //备忘录
+  public class Memento {
+      private String state;
+  
+      public Memento(String state) {
+          super();
+          this.state = state;
+      }
+      public String getState() {
+          return state;
+      }
+  }
+  //发起人
+  @Data
+  public class Originator {
+      private String state;
+      //编写一个方法，可以保存一个状态对象Memento
+      //因此编写一个方法返回一个memento
+      public Memento saveStateMemento(){
+          return new Memento(state);
+      }
+      //通过备忘录对象，回复状态
+      public void getStateFromMemento(Memento memento){
+          state= memento.getState();
+      }
+  }
+  //备忘录管理
+  public class Caretaker {
+      private List<Memento> mementoList=new ArrayList<Memento>();
+      public void addMemento(Memento m) {
+          mementoList.add(m);
+      }
+      public void remove(Memento m) {
+          mementoList.remove(m);
+      }
+      //获取第index个Originator的备忘录对象
+      public Memento get(int index){
+          return mementoList.get(index);
+      }
+  }
+  ```
+
+  客户端
+
+  ```javav
+  public class Client {
+      public static void main(String[] args) {
+          Originator originator = new Originator();
+          Caretaker caretaker = new Caretaker();
+          originator.setState("状态1");
+          //保存了当前的状态
+          Memento memento = originator.saveStateMemento();
+          caretaker.addMemento(memento);
+          System.out.println(originator.getState());
+  
+          originator.setState("状态2");
+          caretaker.addMemento(originator.saveStateMemento());
+          System.out.println(originator.getState());
+          //回复到状态1
+          Memento memento1 = caretaker.get(0);
+          originator.getStateFromMemento(memento1);
+          System.out.println(originator.getState());
+      }
+  }
+  ```
+
+  运行结果
+
+  ```java
+  状态1
+  状态2
+  状态1
+  ```
+
+  类图
+
+  ![备忘录](C:\Users\Administrator\Desktop\DesignPatterns\DesignPatterns\src\main\java\com\freeloop\memento\备忘录.png)
+
+  
+
   
