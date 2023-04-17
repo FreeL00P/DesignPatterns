@@ -2861,3 +2861,152 @@ public class BeiJinDuck extends Duck {
 类图
 
 ![策略模式](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F.png)
+
+### 责任链模式
+
+- 责任链模式（Chain of Responsibility）是一种行为型设计模式。它通过将请求的发送者和接收者解耦，使得多个对象都有机会处理请求。将这些对象串成一条链，并沿着这条链传递请求，知道有一个对象处理它为止。即将能够处理同一件事情的对象连成一条责任链，所提交的请求沿着这条链传递，直到有一个对象处理它，这样既可以提高系统的灵活性和可扩展性，又可以降低系统的耦合度。
+
+- 在责任链模式中，一般会设计出一个抽象处理者类，然后定义出一些具体的处理者类。每个具体的处理者类都应该包含一个指向下一个处理者的引用，从而形成一个链式结构，用户向处理者对象提交请求，处理者对象对请求进行处理，如果它不能处理此请求，则将请求的处理权交给下一个处理者对象，直到请求被处理完毕。
+
+责任链模式优点如下：
+
+1. 解耦逻辑 - 将请求发送者和接收者解耦，使得多个对象都有机会处理请求，客户端不需要知道请求被处理的具体过程，方便维护和修改。
+2. 增强系统的灵活性 - 可以在运行时动态添加或者删除责任链上的对象，改变处理请求的顺序，灵活性大大增强。
+3. 提高代码的可扩展性 - 可以增加或更换责任链上的处理者类，方便扩展或修改业务逻辑。
+
+责任链模式缺点如下：
+
+1. 不能保证请求一定被处理 - 对于链中处理者对象都没有处理该请求的情况，需要提供默认的处理方式，否则该请求将得不到处理。
+2. 对性能有一定影响 - 请求处理时需要穿透整个责任链，直到找到能够处理该请求的节点，这样会对性能产生一定的影响。
+3. 容易造成循环调用 - 如果设计不当，可能会造成循环调用问题，导致系统崩溃。
+
+抽象处理者
+
+```java
+@Data
+public abstract class Approve {
+    Approve approve;//下一个处理者
+    String name;//名字
+
+    public Approve(String name) {
+        this.name=name;
+    }
+    //下一个处理者
+    public Approve(Approve approve) {
+        this.approve = approve;
+    }
+    //处理审批请求的方法，得到一个请求，处理是子类完成，因此该方法做成抽象
+    public abstract void processRequest(PurchaseRequest purchaseRequest);
+
+}
+```
+
+具体处理者
+
+```java
+public class DepartmentApprove extends Approve{
+    public DepartmentApprove(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest pur) {
+        if(pur.getPrice()<=5000){
+            System.out.println("请求编号"+pur.getId()+"被"+this.name+"处理");
+        }else{
+            approve.processRequest(pur);
+        }
+    }
+}
+public class CollageApprove extends Approve{
+    public CollageApprove(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest pur) {
+        if(pur.getPrice()>5000&&pur.getPrice()<=10000){
+            System.out.println("请求编号"+pur.getId()+"被"+this.name+"处理");
+        }else{
+            approve.processRequest(pur);
+        }
+    }
+}
+public class ViceSchoolMasterApprove extends Approve{
+    public ViceSchoolMasterApprove(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest pur) {
+        if(pur.getPrice()>1000&&pur.getPrice()<=30000){
+            System.out.println("请求编号"+pur.getId()+"被"+this.name+"处理");
+        }else{
+            approve.processRequest(pur);
+        }
+    }
+}
+public class SchoolMasterApprove extends Approve{
+    public SchoolMasterApprove(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest pur) {
+        if(pur.getPrice()>30000){
+            System.out.println("请求编号"+pur.getId()+"被"+this.name+"处理");
+        }else{
+            approve.processRequest(pur);
+        }
+    }
+}
+```
+
+请求
+
+```java
+@Data
+public class PurchaseRequest {
+    private int type=0;//请求类型
+    private float price=0.0f;
+    private int id=0;
+
+    public PurchaseRequest(int type,float price, int id) {
+        this.type = type;
+        this.price = price;
+        this.id = id;
+    }
+}
+```
+
+客户端
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        // 创建一个请求
+        PurchaseRequest purchaseRequest = new PurchaseRequest(1, 33100, 1);
+        //创建相关审批人
+        DepartmentApprove departmentApprove = new DepartmentApprove("主任");
+        CollageApprove collageApprove = new CollageApprove("院长");
+        ViceSchoolMasterApprove viceSchoolMasterApprove = new ViceSchoolMasterApprove("副校长");
+        SchoolMasterApprove schoolMasterApprove = new SchoolMasterApprove("校长");
+        //需要将各个审批的下一个处理者设置好 构成一个环形
+        departmentApprove.setApprove(collageApprove);
+        collageApprove.setApprove(viceSchoolMasterApprove);
+        viceSchoolMasterApprove.setApprove(schoolMasterApprove);
+        schoolMasterApprove.setApprove(departmentApprove);
+        viceSchoolMasterApprove.processRequest(purchaseRequest);
+    }
+}
+```
+
+输出
+
+```java
+请求编号1被校长处理
+```
+
+无论谁调用processRequest()方法，请求都能被对应的请求处理类处理
+
+![责任链](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/%E8%B4%A3%E4%BB%BB%E9%93%BE.png)
