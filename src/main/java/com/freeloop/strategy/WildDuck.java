@@ -11,7 +11,6 @@ public class WildDuck extends Duck{
     public WildDuck() {
         flyBehavior=new GoodFlyBehavior();
     }
-
     @Override
     public void disPlay() {
         System.out.println("野鸭子");

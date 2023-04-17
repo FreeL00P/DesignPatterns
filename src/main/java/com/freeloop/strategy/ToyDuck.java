@@ -15,5 +15,4 @@ public class ToyDuck extends Duck{
     public void disPlay() {
         System.out.println("玩具鸭");
     }
-
 }

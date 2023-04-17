@@ -2620,8 +2620,244 @@ public class Client {
 
   类图
 
-  ![备忘录](C:\Users\Administrator\Desktop\DesignPatterns\DesignPatterns\src\main\java\com\freeloop\memento\备忘录.png)
+  ![备忘录](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/%E5%A4%87%E5%BF%98%E5%BD%95.png)
 
-  
 
-  
+### 解释器模式
+
+解释器模式是一种行为型模式，它定义了一组语法规则并描述了这些规则如何解释这些语言表达式。它由四个主要组成部分组成：抽象表达式、终结符表达式、非终结符表达式和上下文。
+
+- 抽象表达式（Abstract Expression）：抽象类或接口，它定义了一个抽象的解释操作interpret()方法，用于对自身进行解释。
+- 终结符表达式（Terminal Expression）：终结符表达式是一个实现了抽象表达式的类，它是一种基本表达式，不能再分解为更小的元素。
+- 非终结符表达式（Nonterminal Expression）：非终结符表达式是一个实现了抽象表达式的类，它由多个终结符表达式和/或其他非终结符表达式组合而成，用于表示复杂的解释操作。
+- 上下文（Context）：上下文是一个环境类，它存储了要解释的语言表达式。
+
+解释器模式的主要思想是：
+
+- 将语言的语法规则通过面向对象的方式进行描述，对每个非终结符表达式定义一个解释操作，在解释操作中定义该非终结符表达式的语法规则，并递归调用其组成部分的解释操作，从而实现整个语言表达式的解释。该模式使得添加新规则和表达式变得简单，只需要添加相应的类和方法即可，同时也增强了语言解析的灵活性。
+
+解释器模式的优缺点：
+
+- 它使得语言解析的逻辑能够独立于语法规则的表达式层次结构而变化，易于扩展、易于实现，同时也有利于优化解释器的性能。其缺点是：当语法规则变得复杂时，可能会导致类的数量急剧增加，系统变得更加复杂难以维护。
+
+### 状态模式
+
+状态模式是一种行为型设计模式，它允许一个对象在其内部状态改变时改变它的行为。
+
+状态模式的核心理念是：将对象的所有状态都封装成一个个的对象，即状态对象，当对象的状态发生改变时，就切换到另一个状态对象。
+
+该模式实现时通常涉及到几个角色：
+
+- 环境类(Context)：用于维护当前状态，可以拥有一个状态接口的引用，以便通过调用 State 接口的方法来更新状态，并将控制权交给新的状态对象。
+- 抽象状态(State)：定义状态所支持的接口，用于在系统的不同状态下的行为进行抽象定义。
+- 具体状态(ConcreteState)：实现了抽象状态接口，并定义其内部状态的行为。
+
+下面我们通过一个简单的例子来演示状态模式如何工作。
+
+假设我们有一个购物车(Cart)对象，它具有“未付款”和“已付款”两种状态，每个状态下会有不同的行为，比如在未付款状态下，我们可以添加商品、删除商品、查看购物车等行为，而在已付款状态下，只能查看购物车。
+
+首先，我们定义了一个 CartState 接口作为状态类的基类，里面包含了两个方法：
+
+```java
+public interface CartState {
+    public void addProduct(String product);
+    public void viewCart();
+}
+```
+
+然后我们实现两个具体状态类 UnpaidState（未付款状态），PaidState（已付款状态），并分别实现 CartState 接口的方法。
+
+```java
+public class UnpaidState implements CartState {
+    private List<String> products = new ArrayList<String>();
+    
+    public void addProduct(String product) {
+        products.add(product);
+        System.out.println(product + "添加到购物车中");
+    }
+    
+    public void viewCart() {
+        System.out.println("--- 你的购物车物品列表 ---");
+        for (String product : products) {
+            System.out.println(product);
+        }
+        System.out.println("--- 总计： $" + products.size() + " ---");
+    }
+}
+
+public class PaidState implements CartState {
+    private List<String> products = new ArrayList<String>();
+    
+    public void addProduct(String product) {
+        System.out.println("你已经付款，不能再添加商品！");
+    }
+    
+    public void viewCart() {
+        System.out.println("--- 你的购物车物品列表 ---");
+        for (String product : products) {
+            System.out.println(product);
+        }
+        System.out.println("--- 总计： $" + products.size() + " ---");
+    }
+}
+```
+
+最后，我们定义 Cart 类，并且实现状态的切换方法。
+
+```java
+public class Cart {
+    private CartState currentState;
+    
+    public Cart() {
+        this.currentState = new UnpaidState();
+    }
+    
+    public void setState(CartState state) {
+        this.currentState = state;
+    }
+    
+    public void addProduct(String product) {
+        this.currentState.addProduct(product);
+    }
+    
+    public void viewCart() {
+        this.currentState.viewCart();
+    }
+}
+
+public class Client {
+    public static void main(String[] args) {
+        Cart cart = new Cart();
+
+        cart.addProduct("Product 1");
+        cart.addProduct("Product 2");
+        cart.addProduct("Product 3");
+        
+        cart.setState(new PaidState());
+        
+        cart.addProduct("Product 4");
+        cart.viewCart();
+    }
+}
+```
+
+在这个例子中，我们演示了状态模式如何工作。我们创建了 CartState 接口，并使用 UnpaidState 和 PaidState 实例来实现其状态。在 Cart 类中，我们使用 currentState 对象来保持 Cart 的状态，并使用 setState() 方法将其状态改变，并调用 addProduct() 和 viewCart() 方法来演示系统的不同状态下的行为。
+
+这样，我们就成功实现了一个简单的状态模式示例。
+
+### 策略模式
+
+策略模式是一种行为型设计模式，它允许在运行时根据具体情况或需求选择不同的算法或策略。
+
+策略模式的核心思想是将不同的算法或策略封装成独立的类，使得它们可以互相替换，而客户端代码不会受到任何影响。策略模式通常涉及到三个角色：
+
+- 环境(Context)：持有一个策略类的引用，它会根据具体情况调用相应的策略类来执行任务。
+- 抽象策略(Strategy)：定义了一个公共接口，所有的具体策略都必须实现此接口。
+- 具体策略(ConcreteStrategy)：实现了抽象策略接口，并提供了不同的算法或策略。
+
+优点：
+
+1. 策略模式可以提高代码的可扩展性，使得系统更加灵活，易于维护和扩展。
+2. 策略模式可以将算法的实现与使用分离，客户端代码只需关注算法的接口，而不需要了解算法的具体实现。
+3. 策略模式可以降低系统的耦合度，不同的策略实现都仅仅有一个公共的接口，使得它们可以相互替换，减少了代码之间的依赖和耦合。
+4. 策略模式可以避免出现庞大的条件语句，代码更清晰、简洁。
+
+缺点：
+
+1. 策略模式会增加代码的数量，因为每个策略都需要一个具体实现类。
+2. 策略模式会增加代码结构的复杂度，因为需要创建一系列的策略类和环境类，并且需要客户端去选择使用不同的策略。
+3. 在某些情况下，使用策略模式可能会导致性能降低，因为客户端可能需要动态选择不同的策略，而切换策略时会产生额外的开销。
+
+抽象策略
+
+```java
+public interface FlyBehavior {
+    void fly();//子类具体实现
+}
+public class BadFlyBehavior implements FlyBehavior {
+
+    @Override
+    public void fly() {
+        System.out.println("不善于飞翔的鸭子");
+    }
+}
+public class GoodFlyBehavior implements FlyBehavior {
+    @Override
+    public void fly() {
+        System.out.println("擅长飞行的鸭子");
+    }
+}
+public class NoFlyBehavior implements FlyBehavior {
+    @Override
+    public void fly() {
+        System.out.println("不善于飞翔的鸭子");
+    }
+}
+```
+
+环境角色
+
+```java
+public abstract class Duck {
+    //属性，策略接口
+    FlyBehavior flyBehavior;
+    //其他属性
+    public Duck(){
+    }
+    public abstract void disPlay();//显示鸭子信息
+    public void quack(){
+        System.out.println("鸭子叫");
+    }
+    public void swim(){
+        System.out.println("鸭子会游泳");
+    }
+    public void fly(){
+        if (flyBehavior!=null){
+            flyBehavior.fly();
+        }
+    }
+
+    public void setFlyBehavior(FlyBehavior flyBehavior) {
+        this.flyBehavior = flyBehavior;
+    }
+}
+```
+
+具体策略角色
+
+```java
+public class ToyDuck extends Duck{
+    public ToyDuck() {
+        flyBehavior=new NoFlyBehavior();
+    }
+
+    @Override
+    public void disPlay() {
+        System.out.println("玩具鸭");
+    }
+}
+public class WildDuck extends Duck{
+    //构造器传入FlyBehavior
+    public WildDuck() {
+        flyBehavior=new GoodFlyBehavior();
+    }
+    @Override
+    public void disPlay() {
+        System.out.println("野鸭子");
+    }
+}
+public class BeiJinDuck extends Duck {
+    public BeiJinDuck() {
+        flyBehavior=new NoFlyBehavior();
+    }
+    @Override
+    public void disPlay() {
+        System.out.println("北京鸭子");
+    }
+
+}
+```
+
+类图
+
+![策略模式](https://freelooptc.oss-cn-shenzhen.aliyuncs.com/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F.png)

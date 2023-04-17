@@ -10,7 +10,6 @@ public class BeiJinDuck extends Duck {
     public BeiJinDuck() {
         flyBehavior=new NoFlyBehavior();
     }
-
     @Override
     public void disPlay() {
         System.out.println("北京鸭子");
